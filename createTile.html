@@ -80,7 +80,7 @@
         	localStorage.setItem("jobBase", jTable);
 		window.location.href = "main.html";
 
-		/*
+	/*	
 		            if (window.XMLHttpRequest) {
 			            // code for IE7+, Firefox, Chrome, Opera, Safari
 			            xmlhttp = new XMLHttpRequest();
@@ -94,8 +94,11 @@
 						console.log(xmlhttp.responseText);
 			                }
 			        }
-			       xmlhttp.open("GET","getuser.php?cName="+cName+"&cDesc="+compDesc+"&cProd="+compProduce+"&skills="+skills,
-			       true);
+
+			var dummy = "hi";
+			// xmlhttp.open("GET","getuser.php?cName="+cName+"&cDesc="+compDesc,true);
+			       xmlhttp.open("GET","getuser.php?name="+cName+"&cDesc="+compDesc+"&cProd="+compProduct+"&skills="+skills+"&category="+category+"&url="+yURL, true);
+				xmlhttp.send();
 
 			 //xmlhttp.open("GET","getuser.php?q="+sample,true);
 		/*var jTable = localStorage.getItem("jobBase") || {};
