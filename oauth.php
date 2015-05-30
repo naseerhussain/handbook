@@ -24,7 +24,7 @@ if(isset($_GET['oauth_token']))
 				$_SESSION['twitter_id']=$content->screen_name;
 				
 				//redirect to main page.
-				header('Location: login.php'); 
+				header('Location: mypage.php'); 
 
 			}
 			else

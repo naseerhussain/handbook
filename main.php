@@ -198,12 +198,12 @@ Object.key = function(obj){
 <body>
 	<div class="container">
 		<br><br>
-		<a href="index.html" id="logout" class="btn btn-sm btn-danger pull-right">Log Out</a>
+		<!--<a href="index.html" id="logout" class="btn btn-sm btn-danger pull-right">Log Out</a>
 		<a href="createTile.html" id="create" class="btn btn-sm pull-right btn-primary" style="margin-right:2%;">Create</a>
 
 		<!--<button class="btn btn-sm pull-right btn-info" data-toggle="modal" data-target="#signUpModal">Sign Up</button>-->
 
-		<button class="btn btn-sm pull-right btn-primary" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>
+		<button class="btn btn-sm pull-right btn-success" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>
 		<div class="row" style="margin-top:5%">
 			<div class="col">
 				<table class="table table-condensed" style="text-align:center;">
