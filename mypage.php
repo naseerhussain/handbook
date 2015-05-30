@@ -194,7 +194,7 @@ div.thumbnail:hover {
     cursor: pointer;
     opacity: .9;
 }
- 
+
 a.divLink {
     position: absolute;
     width: 100%;
@@ -207,7 +207,35 @@ a.divLink {
     opacity: 0;
     filter: alpha(opacity=0);
 }
-
+a.remove1{
+    cursor: pointer;
+    width:10%;
+    display: block;
+    float: right;  
+    z-index: 10;
+    position: absolute; /*newly added*/
+    left: 5px; /*newly added*/
+    top: 5px;/*
+}
+a.remove2{
+    cursor: pointer;
+    display: block;
+    width:10%;
+    float: right;  
+    z-index: 10;
+    position: absolute; /*newly added*/
+    left: 205px; /*newly added*/
+    top: 5px;/*
+}
+#remove1{
+	/*position:relative;*/
+	top:240px;
+	left:20px;
+}
+#remove2{
+	top:240px;
+	z-index:10;
+}
 </style>
 
 <script>
@@ -234,11 +262,30 @@ a.divLink {
 	}
 
 	for(var i=0;i<getTilesInfo.length;i++){
-		var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p></div>';
+		var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
 
 		$("#thumbnails").append(div);	
 	}
-	
+
+	$(".changes").unbind("mouseenter mouseleave");
+
+	/*$("#remove1").click(function(){
+		
+		alert("edit");
+	})
+	$("#remove2").click(function(){
+		alert("delete");
+	});*/	
+	$(".remove1").click(function(){
+		event.stopPropagation();
+		var clicked = $(this).find("img:first").attr("zid");
+		console.log(clicked );
+		console.log(this);	
+	});
+	$(".remove2").click(function(){
+		event.stopPropagation();
+		var clicked = $(this).find("img:first").attr("zid");
+	});
 	$("#searchCompany").keyup(function(){
 		clearContainer();
 		var search = $("#searchCompany").val();
