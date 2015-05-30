@@ -207,6 +207,7 @@ a.divLink {
     opacity: 0;
     filter: alpha(opacity=0);
 }
+/*
 a.remove1{
     cursor: pointer;
     width:10%;
@@ -214,8 +215,8 @@ a.remove1{
     float: right;  
     z-index: 10;
     position: absolute; /*newly added*/
-    left: 5px; /*newly added*/
-    top: 5px;/*
+   /* left: 5px; /*newly added*/
+    /*top: 5px;/*
 }
 a.remove2{
     cursor: pointer;
@@ -224,13 +225,14 @@ a.remove2{
     float: right;  
     z-index: 10;
     position: absolute; /*newly added*/
-    left: 205px; /*newly added*/
-    top: 5px;/*
-}
+   /* left: 205px; /*newly added*/
+    /*top: 5px;/*
+}*/
 #remove1{
 	/*position:relative;*/
 	top:240px;
 	left:20px;
+	z-index:10;
 }
 #remove2{
 	top:240px;
@@ -275,16 +277,28 @@ a.remove2{
 	})
 	$("#remove2").click(function(){
 		alert("delete");
-	});*/	
+	});*/
+	var tileClicked;	
 	$(".remove1").click(function(){
 		event.stopPropagation();
-		var clicked = $(this).find("img:first").attr("zid");
-		console.log(clicked );
-		console.log(this);	
+		tileClicked = $(this).find("img:first").attr("zid");
+		$("#editTopicModal").modal('show');
+
+		for(var i=0;i<getTilesInfo.length;i++){
+			if(getTilesInfo[i].id == tileClicked){
+				$("#editLname").val(getTilesInfo[i].name);
+				$("#editLintent").val(getTilesInfo[i].intent);
+				$("#editLabout").val(getTilesInfo[i].about);
+				$('input[name=editLteach][value="'+getTilesInfo[i].canTeach+'"]').prop('checked',true);
+				$('input[name=editLvenue][value="'+getTilesInfo[i].venue+'"]').prop('checked',true);
+				$('input[name=editLrsvp][value="'+getTilesInfo[i].rsvp+'"]').prop('checked',true);
+			}
+		}
 	});
 	$(".remove2").click(function(){
 		event.stopPropagation();
-		var clicked = $(this).find("img:first").attr("zid");
+		tileClicked = $(this).find("img:first").attr("zid");
+		$("#deleteTileModal").modal('show');
 	});
 	$("#searchCompany").keyup(function(){
 		clearContainer();
@@ -338,6 +352,59 @@ a.remove2{
 		}else{
 			$("#Uno").prop('checked',true);
 		}
+
+	});
+
+	$("#updateTile").click(function(){
+		validateListInfo();
+		
+		var name = $("#editLname").val();
+		var intent = $("#editLintent").val();
+		var abt = $("#editLabout").val();
+		var teach = $("input[name=editLteach]").val();
+		var venue = $("input[name=editLvenue]").val();
+		var rsvp = $("input[name=editLrsvp]").val();
+
+		$("#editTopicModal").modal('hide');
+		//call updaeTileInfo.php file
+		if (window.XMLHttpRequest) {
+                	// code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        	//document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+		xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
+                xmlhttp.send();
+		location.reload();
+
+	});
+
+	$("#deleteTile").click(function(){
+		$("#deleteTileModal").modal('hide');
+                //call updaeTileInfo.php file
+                if (window.XMLHttpRequest) {
+                        // code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+                xmlhttp.open("GET","deleteTile.php?id="+tileClicked+"&twitter_id="+id, true);
+                xmlhttp.send();
+                location.reload();
 
 	});
  });
@@ -425,9 +492,9 @@ function validation(){
 }
 
 function validateListInfo(){
-	var name = $("#lname").val();
-	var intent = $("#lintent").val();
-	var abt = $("labout").val();
+	var name = $("#lname").val() || $("#editLname").val();
+	var intent = $("#lintent").val() || $("#editLintent").val();
+	var abt = $("labout").val() || $("#editLabout").val();
 	
 	if(name == ""){
 		alert("Please Enter the name");
@@ -435,11 +502,11 @@ function validateListInfo(){
 	}
 	if(intent == ""){
 		alert("Please enter the intent");
-		return;
+		return false;
 	}
 	if(abt == ""){
 		alert("Please enter the about");
-		return;
+		return false;
 	}
 	return true;
 }
@@ -505,6 +572,28 @@ function validateListInfo(){
 
   		</div>
 		</div>		
+		
+		<!-- DELETE SUBJECT/TOPIC TILE MODAL-->
+                <div id="deleteTileModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+
+                        <div class="modal-content" style="width:50%;">
+                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title" style="color:white">Confirm Delete</h4>
+                                </div>
+                                <div class="modal-body">
+					Are You sure to delete this Subject/Topic ?
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="deleteTile" >Delete</button>
+                                </div>
+                        </div>
+
+                </div>
+                </div>
+
+
 
 		<!-- SIGN UP COMPANY DETAILS MODAL-->
 		<div id="signUpModal" class="modal fade" role="dialog">
@@ -634,8 +723,54 @@ function validateListInfo(){
 
                 </div>
                 </div>
+		
+		 <!-- EDIT TILE FOR SUBJECT/TOPIC LIST-->
+                <div id="editTopicModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
 
+                <!-- Modal content-->
+                        <div class="modal-content" style="width:70%;">
+                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title" style="color:white">Edit Subject/Topic</h4>
+                                </div>
+                                <div class="modal-body">
+                                       <!-- <form method="post" action="saveTopic.php" enctype="multipart/form-data" onsubmit="return validateListInfo();">-->
+					<form>
+                                                <label class="block">Topic/Subject Name :</label><br>
+                                                <input type="text" name="editLname" id="editLname" class="block" style="width:100%;"><br>
+                                                <label class="block">Intent :</label><br>
+                                                <input type="text" name="editLintent" id="editLintent" class="block" style="width:100%;"><br>
+                                                <label>About the Topic/Subject : </label><br>
+                                                <textarea id="editLabout" name="editLabout" style="width:100%" rows=5></textarea><br>
+                                                <label>Others can teach this : </label>&nbsp;&nbsp;
+                                                <!-- <div class="radio">-->
+                                                        <label><input type="radio" name="editLteach" value="yes" checked>Yes</label>&nbsp;&nbsp;
+                                                        <label><input type="radio" name="editLteach" value="no">No</label>
+                                                <!--</div>-->
+                                                <br><label >Venue : </label>
+                                                <!--<div class="radio">-->
+                                                        <label><input type="radio" name="editLvenue" value="notAvailable" checked>To be Decided</label>&nbsp;&nbsp;
+                                                        <label><input type="radio" name="editLvenue" value="Available" >Available</label>
+                                                <!--</div>-->
+                                                <br><label >Create RSVP : </label>&nbsp;&nbsp;
+                                                <!--<div class="radio" style="width:100%">-->
+                                                        <label><input type="radio" name="editLrsvp" value="yes" checked>Yes</label>&nbsp;&nbsp;
+                                                        <label><input type="radio" name="editLrsvp" value="no">No</label>
+                                                <!--</div><br>-->
+                                              <!--  <br><br><input type="submit" value="Update topic" class="btn btn-primary pull-right" >-->
 
+                                        </form>
+                                </div>
+				 <div class="modal-footer">
+                                        <button type="button" id="updateTile" class="btn btn-sm btn-primary" >Update Info</button>
+                                </div>
+                        </div>
+
+                </div>
+                </div>
+
+				
 	
 	</div>
 </body>
