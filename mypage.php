@@ -109,7 +109,7 @@ else // Not logged in
                 if(! $conn){
                         die("Connection failed: " . mysql_error());
                 }
-                $sql = 'select *from topics where twitter_id ="' . $_SESSION['twitter_id'].'"';
+                $sql = 'select *from topics';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
                 //$query ='select *from company';
                 mysql_select_db('handbook');
@@ -231,7 +231,7 @@ a.remove2{
 #remove1{
 	/*position:relative;*/
 	top:240px;
-	left:20px;
+/*	left:20px;*/
 	z-index:10;
 }
 #remove2{
@@ -251,9 +251,12 @@ a.remove2{
 	var id = '<?php echo $_SESSION['twitter_id'];?>';
 
 	$("#logout").hide();
+	$("#updateInfo").hide();
 
-	if(db_results.length < 1){
-		$("#signUpModal").modal('show');
+	if(db_results.length > 0){
+		//$("#signUpModal").modal('show');
+		$("#updateInfo").show();
+		$("#createProfile").hide();
 	}
 	if(getTilesInfo.length == 0){
 		for(var key in db_results){
@@ -288,6 +291,7 @@ a.remove2{
 			if(getTilesInfo[i].id == tileClicked){
 				$("#editLname").val(getTilesInfo[i].name);
 				$("#editLintent").val(getTilesInfo[i].intent);
+				$("#editLlocation").val(getTilesInfo[i].location);
 				$("#editLabout").val(getTilesInfo[i].about);
 				$('input[name=editLteach][value="'+getTilesInfo[i].canTeach+'"]').prop('checked',true);
 				$('input[name=editLvenue][value="'+getTilesInfo[i].venue+'"]').prop('checked',true);
@@ -300,7 +304,7 @@ a.remove2{
 		tileClicked = $(this).find("img:first").attr("zid");
 		$("#deleteTileModal").modal('show');
 	});
-	$("#searchCompany").keyup(function(){
+	$("#searchLocation").keyup(function(){
 		clearContainer();
 		var search = $("#searchCompany").val();
 		filteredResults(getTilesInfo, search, "cName");
@@ -356,16 +360,21 @@ a.remove2{
 	});
 
 	$("#updateTile").click(function(){
-		validateListInfo();
+		var validate = validateListInfo();
 		
 		var name = $("#editLname").val();
 		var intent = $("#editLintent").val();
+		var loc = $("#editLlocation").val();
 		var abt = $("#editLabout").val();
 		var teach = $("input[name=editLteach]").val();
 		var venue = $("input[name=editLvenue]").val();
 		var rsvp = $("input[name=editLrsvp]").val();
 
-		$("#editTopicModal").modal('hide');
+		if(validate){
+			$("#editTopicModal").modal('hide');
+		}else{
+			return false;
+		}
 		//call updaeTileInfo.php file
 		if (window.XMLHttpRequest) {
                 	// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -380,7 +389,7 @@ a.remove2{
                                 console.log(xmlhttp.responseText);
                         }
                 }
-		xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
+		xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&location="+loc+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
                 xmlhttp.send();
 		location.reload();
 
@@ -407,7 +416,31 @@ a.remove2{
                 location.reload();
 
 	});
+
+	$("input:radio[name=filter]").click(function(){
+		var value = $("input[name='filter']:checked").val();
+		clearContainer();
+
+		drawTiles(getTilesInfo, id);
+	});
  });
+
+
+function drawTiles(getTilesInfo, id){
+	
+	for(var i=0;i<getTilesInfo.length;i++){
+		if(getTilesInfo[i].twitter_id == id){
+			
+			var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+		}else{
+			
+			var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
+
+		}
+
+                $("#thumbnails").append(div); 
+	}
+}
 
 function getInfo(){
 	var jTable = localStorage.getItem("jobBase") || {};
@@ -425,10 +458,13 @@ function filteredResults(getTilesInfo,search, attribute){
 		var str =getTilesInfo[i];
 		str = str[attribute];
 		if(str.search(search) > -1){
-			var div = '<div class="thumbnail"><video src='+getTilesInfo[i].url+' controls="true"></video><legend>'+getTilesInfo[i].cName+'</legend><legend><p>'+getTilesInfo[i].compDesc+'</p><p>'+getTilesInfo[i].category+'</p></legend><p>'+getTilesInfo[i].compProduct+'</p><legend></legend><p>'+getTilesInfo[i].skills+'</p><p><a class="divLink" id="'+getTilesInfo[i].cName+i+'"></a></p></div>';
-	                $("#thumbnails").append(div);   
 
+			var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+
+			$("#thumbnails").append(div);	
 		}
+
+
 	}
 }
 
@@ -494,7 +530,8 @@ function validation(){
 function validateListInfo(){
 	var name = $("#lname").val() || $("#editLname").val();
 	var intent = $("#lintent").val() || $("#editLintent").val();
-	var abt = $("labout").val() || $("#editLabout").val();
+	var abt = $("#labout").val() || $("#editLabout").val();
+	var loc = $("#llocation").val() || $("#editLlocation").val();
 	
 	if(name == ""){
 		alert("Please Enter the name");
@@ -502,6 +539,10 @@ function validateListInfo(){
 	}
 	if(intent == ""){
 		alert("Please enter the intent");
+		return false;
+	}
+	if(loc == ""){
+		alert("Please Enter the location");
 		return false;
 	}
 	if(abt == ""){
@@ -520,29 +561,35 @@ function validateListInfo(){
 		<!--<a href="createTile.html" id="create" class="btn btn-sm pull-right btn-primary" style="margin-right:2%;">Create</a>-->
 
 		<button class="btn btn-sm pull-right btn-info" id="updateInfo" data-target="#updateProfileModal" style="margin-right:2%;">Update Profile</button>
+		
+		<button class="btn btn=sm pull-right btn-info" data-toggle="modal" id="createProfile" data-target="#signUpModal" style="margin-right:2%;">Create Profile</button>
 
 		<button class="btn btn-sm pull-left btn-info" data-toggle="modal" data-target="#topicTileModal" style="margin-right:2%;">Create Topic/Subject</button>
 
 	<!--	<button class="btn btn-sm pull-right btn-primary" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>-->
 		<div class="row" style="margin-top:5%">
-			<div class="col">
+		<!--	<div class="col">
 				<table class="table table-condensed" style="text-align:center;">
     					<thead>
         					<tr>
-            						<th style="text-align:center">Start Up</th>
             						<th style="text-align:center">Category</th>
             						<th style="text-align:center">Technology Used</th>
+							<th style="text-align:center">Location</th>
         					</tr>
     					</thead>
 					<tbody>
 						<tr>
-							<td><input type="text" id="searchCompany"></td>
 							<td><input type="text" id="searchCategory"></td>
 							<td><input type="text" id="searchTech"></td> 
+							<td><input type="text" id="searchLocation"></td>
 						</tr>
 					<tbody>
 				</table>
-			</div>
+			</div>-->
+				<label >Show : </label>&nbsp;&nbsp;
+                                <label><input type="radio" name="filter" value="yes" checked>All Tiles</label>&nbsp;&nbsp;
+                                <label><input type="radio" name="filter" value="no">My Tiles</label>
+
 		</div>
 		<div class="row" style="margin-top:2%; background-color:#E0E0E0;">
 			<div class = "tiles">
@@ -695,8 +742,11 @@ function validateListInfo(){
                                                 <input type="text" name="lname" id="lname" class="block" style="width:100%;"><br>
                                                 <label class="block">Intent :</label><br>
                                                 <input type="text" name="lintent" id="lintent" class="block" style="width:100%;"><br>
+						<label class="block">Location</label><br>
+						<input type="text" name="llocation" id="llocation" class="block" style="width:100%;"><br>
 						<label>About the Topic/Subject : </label><br>
                                                 <textarea id="labout" name="labout" style="width:100%" rows=5></textarea><br>
+						
 						<label>Others can teach this : </label>&nbsp;&nbsp;
 						<!-- <div class="radio">-->
                                                         <label><input type="radio" name="teach" value="yes" checked>Yes</label>&nbsp;&nbsp;
@@ -704,7 +754,7 @@ function validateListInfo(){
                                                 <!--</div>-->
 						<br><label >Venue : </label>
 						<!--<div class="radio">-->
-                                                        <label><input type="radio" name="venue" value="notAvailable" checked>To be Decided</label>&nbsp;&nbsp;
+                                                        <label><input type="radio" name="venue" value="Not Available" checked>To be Decided</label>&nbsp;&nbsp;
                                                         <label><input type="radio" name="venue" value="Available" >Available</label>
                                                 <!--</div>-->
 						<br><label >Create RSVP : </label>&nbsp;&nbsp;
@@ -741,6 +791,8 @@ function validateListInfo(){
                                                 <input type="text" name="editLname" id="editLname" class="block" style="width:100%;"><br>
                                                 <label class="block">Intent :</label><br>
                                                 <input type="text" name="editLintent" id="editLintent" class="block" style="width:100%;"><br>
+						<label class="block">Location :</label><br>
+						<input type="text" name="editLlocation" id="editLlocation" class="block" style="width:100%;"><br>
                                                 <label>About the Topic/Subject : </label><br>
                                                 <textarea id="editLabout" name="editLabout" style="width:100%" rows=5></textarea><br>
                                                 <label>Others can teach this : </label>&nbsp;&nbsp;

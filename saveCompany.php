@@ -20,23 +20,28 @@
 
 	
 	//file upload code
-	if(!is_dir("images/uploads/")) {
-		mkdir("images/uploads/");
+	if(!is_dir("uploads")) {
+		mkdir("uploads",0777);
 	}
+	$fileName = $_FILES["file"]["name"]; 
+	$fileTmpLoc = $_FILES["file"]["tmp_name"];
+	$temp = $id ;
+	// Path and file name
+	$pathAndName = "uploads/".$fileName;
+	rename($pathAndName,$temp);
+	move_uploaded_file($fileTmpLoc, "uploads/".$temp);
 
-	move_uploaded_file($_FILES["file"]["tmp_name"],"images/uploads/" . $_FILES["file"]["name"]);
-	$picname1=$_FILES['file']['name'];	
-
+	exec("find uploads/ -type f -exec chmod 0777 {} +");
 	
-	$sql ="INSERT INTO company(id,name,twitter_id,category,location,about,image_url,create_list) VALUES (NULL,'$name','$id','$category','$loc','$abt','$picname1','$list')";
+	$sql ="INSERT INTO company(id,name,twitter_id,category,location,about,create_list) VALUES (NULL,'$name','$id','$category','$loc','$abt','$list')";
 	mysql_select_db('handbook');
 	$insert = mysql_query( $sql, $conn );
 
-	//if (! $insert) {
-        //	die('Could not enter data: ' . mysql_error());
-	//} else {
-    	//	echo "Data entered successfully";
-	//}
+	if (! $insert) {
+        	die('Could not enter data: ' . mysql_error());
+	} else {
+    		echo "Data entered successfully";
+	}
 
 	mysql_close($conn);
 	header('Location: mypage.php');

@@ -1,3 +1,39 @@
+<?php
+
+        require_once('toJson.php');
+        session_start();
+
+        if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether user already logged in with twitter
+        {
+                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+
+
+                if(! $conn){
+                        die("Connection failed: " . mysql_error());
+                }
+                $query = 'select *from company where twitter_id ="' . $_SESSION['twitter_id'].'"';
+
+                //$query ='select *from company';
+                mysql_select_db('handbook');
+                $retval = mysql_query( $query, $conn );
+                if(! $retval )
+                {
+                        die('Could not get data: ' . mysql_error());
+                }
+                $rows = array();
+                while($row = mysql_fetch_array($retval, MYSQL_ASSOC))
+                {
+                        $rows[] = $row;
+                }
+                $result = json_encode($rows);
+                mysql_close($conn);
+
+        }
+
+?>
+
+
+
 <!DOCTYPE html>
 
 <html lang="en">
