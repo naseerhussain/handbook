@@ -141,13 +141,15 @@ a.divLink {
 </style>
 
 <script>
+
+var company = '<?php echo $result; ?>';
+    company = JSON.parse(company);
+        
+var getTilesInfo = '<?php echo $topics; ?>';
+    getTilesInfo = JSON.parse(getTilesInfo);
+
 $(document).ready(function(){
 	$("#goBack").hide();
-	var company = '<?php echo $result; ?>';
-        company = JSON.parse(company);
-        
-        var getTilesInfo = '<?php echo $topics; ?>';
-        getTilesInfo = JSON.parse(getTilesInfo);
 
 	for(var i=0;i<company.length;i++){
 		var div = '<div class="thumbnail"><img src="'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
@@ -170,7 +172,24 @@ $(document).ready(function(){
 		location.reload();	
 	});
 
+	$("#searchCategory").keyup(function(){
+                clearContainer();
+                var search = $("#searchCategory").val();
+                filteredResults(company, search, "category");
+        });
 
+	//Search technology function
+        /*$("#searchTech").keyup(function(){
+                clearContainer();
+                var search = $("#searchTech").val();
+                filteredResults(company, search, "skills");
+        });*/
+	
+	$("#searchLocation").keyup(function(){
+		clearContainer();
+		var search = $("#searchLocation").val();
+		filteredResults(company,search,"location");
+	});
 
 });
 
@@ -190,6 +209,33 @@ function drawTopicsTiles(getTilesInfo, zid){
 	}	
 }
 
+function filteredResults(company,search, attribute){
+        
+        for(var i=0;i<company.length;i++){
+                var str = company[i];
+                str = str[attribute];
+                if(str.search(search) > -1){
+
+			var div = '<div class="thumbnail"><img src="'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
+                        $("#thumbnails").append(div);   
+                }
+
+
+        }
+	$(".thumbnail").click(function(){
+                var clicked = $(this).find("a:first").attr("id");
+                var zid = $(this).find("a:first").attr("zid");
+                console.log(clicked);
+                console.log(zid);
+                $("#table").hide();
+                $("#goBack").show();
+                clearContainer();               
+                drawTopicsTiles(getTilesInfo, zid);
+        });
+
+}
+
+
 </script>
 </head>
 <body>
@@ -204,16 +250,16 @@ function drawTopicsTiles(getTilesInfo, zid){
 				<table class="table table-condensed" style="text-align:center;" id="table">
     					<thead>
         					<tr>
-            						<th style="text-align:center">Start Up</th>
             						<th style="text-align:center">Category</th>
-            						<th style="text-align:center">Technology Used</th>
+            					<!--	<th style="text-align:center">Technology Used</th>-->
+            						<th style="text-align:center">Location</th>
         					</tr>
     					</thead>
 					<tbody>
 						<tr>
-							<td><input type="text" id="searchCompany"></td>
 							<td><input type="text" id="searchCategory"></td>
-							<td><input type="text" id="searchTech"></td> 
+					<!--		<td><input type="text" id="searchTech"></td>-->
+							<td><input type="text" id="searchLocation"></td>
 						</tr>
 					<tbody>
 				</table>

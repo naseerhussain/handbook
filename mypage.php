@@ -242,6 +242,8 @@ a.remove2{
 
 <script>
  $(document).ready(function(){
+	$("#goBack").hide();
+	$("#subscribeTopic").hide();
 	var db_results = '<?php echo $result; ?>';
 	db_results = JSON.parse(db_results);
 	
@@ -325,11 +327,13 @@ a.remove2{
 	$(".thumbnail").click(function(){
 		var clicked = $(this).find("a:first").attr("id");
 		var zid = $(this).find("a:first").attr("zid");
-		console.log(clicked);
-		console.log(zid);
-		if(clicked != undefined && zid != undefined){
-			//window.location.href = "details.html?id='"+clicked+"'&zid='"+zid+"'";
-		}
+
+		$("#goBack").show();
+		$("#filter").hide();
+		$("#createTopic").hide();
+		$("#subscribeTopic").show();
+	 	clearContainer();
+		showTileInfo(getTilesInfo,clicked,zid);		
 	});
 
 
@@ -423,6 +427,35 @@ a.remove2{
 
 		drawTiles(getTilesInfo, id);
 	});
+
+	/*$("#goBack").click(function(){
+                clearContainer();
+		$("#createTopic").show();
+		$("#subscribeTopic").hide();
+		$("#goBack").hide();
+                location.reload();      
+        });
+	
+	$("#subscribe").click(function(){
+		var email = $("#email").val();
+		if (window.XMLHttpRequest) {
+                        // code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+                xmlhttp.open("GET","subscribe.php?id="+tileClicked+"&twitter_id="+id+"&email="+email, true);
+                xmlhttp.send();
+		
+	});*/
+
  });
 
 
@@ -440,6 +473,17 @@ function drawTiles(getTilesInfo, id){
 
                 $("#thumbnails").append(div); 
 	}
+}
+
+function showTileInfo(getTilesInfo, clicked, zid){
+		
+	for(var i=0;i<getTilesInfo.length;i++){
+		if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
+			var div = '<div><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
+			$("#thumbnails").append(div);
+		}
+	}
+
 }
 
 function getInfo(){
@@ -470,9 +514,6 @@ function filteredResults(getTilesInfo,search, attribute){
 
 function clearContainer(){
 	$("div .thumbnail").remove();
-
-//	var thumb = "<div class='thumbnail'><h3>Post Job</h3><p>Company Name</p><p>Company Description</p><p>Products</p><p>Required Skills</p></div>";
-//	$("#thumbnails").append(thumb);
 }
 	
 
@@ -564,7 +605,7 @@ function validateListInfo(){
 		
 		<button class="btn btn=sm pull-right btn-info" data-toggle="modal" id="createProfile" data-target="#signUpModal" style="margin-right:2%;">Create Profile</button>
 
-		<button class="btn btn-sm pull-left btn-info" data-toggle="modal" data-target="#topicTileModal" style="margin-right:2%;">Create Topic/Subject</button>
+		<button class="btn btn-sm pull-left btn-info" id="createTopic" data-toggle="modal" data-target="#topicTileModal" style="margin-right:2%;">Create Topic/Subject</button>
 
 	<!--	<button class="btn btn-sm pull-right btn-primary" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>-->
 		<div class="row" style="margin-top:5%">
@@ -586,9 +627,17 @@ function validateListInfo(){
 					<tbody>
 				</table>
 			</div>-->
+			<div id="filter">
 				<label >Show : </label>&nbsp;&nbsp;
                                 <label><input type="radio" name="filter" value="yes" checked>All Tiles</label>&nbsp;&nbsp;
                                 <label><input type="radio" name="filter" value="no">My Tiles</label>
+			</div>
+			<button class="btn btn-sm pull-left btn-info" style="margin-right:2%;" id="goBack">Go Back</button>
+			<div id="subscribeTopic" class="pull-right">
+				<label>Subscribe :</label>
+				<input type="text" class="input-sm" placeholder="E-mail Id" id="email" >&nbsp;&nbsp;
+				<button id="subscribe" class="btn btn-sm btn-success">Subscribe</button>
+			</div>
 
 		</div>
 		<div class="row" style="margin-top:2%; background-color:#E0E0E0;">
