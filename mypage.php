@@ -333,7 +333,7 @@ a.remove2{
 		$("#createTopic").hide();
 		$("#subscribeTopic").show();
 	 	clearContainer();
-		showTileInfo(getTilesInfo,clicked,zid);		
+		showTileInfo(getTilesInfo, db_results,clicked,zid);		
 	});
 
 
@@ -475,12 +475,21 @@ function drawTiles(getTilesInfo, id){
 	}
 }
 
-function showTileInfo(getTilesInfo, clicked, zid){
+function showTileInfo(getTilesInfo, company, clicked, zid){
 		
-	for(var i=0;i<getTilesInfo.length;i++){
-		if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
-			var div = '<div><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
-			$("#thumbnails").append(div);
+	for(var k=0;k<company.length;k++){
+		for(var i=0;i<getTilesInfo.length;i++){
+			if(company[k].twitter_id == getTilesInfo[i].twitter_id){
+				if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
+					var div = '<div class="thumbnail" style="width:90%;margin-left:5%;"><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].twitter_id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
+
+
+
+/*
+<p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
+*/					$("#thumbnails").append(div);
+				}
+			}
 		}
 	}
 
