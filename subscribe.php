@@ -1,5 +1,7 @@
 <?PHP
 	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+
 
 	$id = $_GET["id"];
 	$twitter_id = $_GET["twitter_id"];
@@ -11,6 +13,7 @@
 
 	$sql = "INSERT INTO subscribers(id, twitter_id, email) VALUES(NULL,'$twitter_id','$email')"; 
 	mysql_select_db('handbook');
+	//mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );
 	
 	mysql_close($conn);

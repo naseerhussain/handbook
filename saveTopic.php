@@ -1,7 +1,8 @@
 <?PHP
 
         session_start();
-        $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//        $conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+	 $conn = mysql_connect("localhost:3306", "root", "pwd");
 
 
         if(! $conn){
@@ -28,6 +29,7 @@
 	
 	$sql ="INSERT INTO topics(id,name,intent,location,about,canTeach,venue,rsvp,twitter_id) VALUES (NULL,'$name','$intent','$loc','$abt','$teach','$venue','$rsvp','$id')";
         mysql_select_db('handbook');
+	//mysql_select_db('bookmane_handbook');
         $insert = mysql_query( $sql, $conn );
 
 	mysql_close($conn);

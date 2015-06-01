@@ -4,6 +4,8 @@
         session_start();
 
                 $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+
 
 
                 if(! $conn){
@@ -13,6 +15,7 @@
 
                 //$query ='select *from company';
                 mysql_select_db('handbook');
+	//	mysql_select_db('bookmane_handbook');
                 $retval = mysql_query( $query, $conn );
                 if(! $retval )
                 {
@@ -34,6 +37,8 @@
         session_start();
 
                 $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+
 
 
                 if(! $conn){
@@ -43,6 +48,7 @@
 
                 //$query ='select *from company';
                 mysql_select_db('handbook');
+		//mysql_select_db('bookmane_handbook');
                 $ret = mysql_query( $sql, $conn );
 
                 if(! $ret )
@@ -152,7 +158,7 @@ $(document).ready(function(){
 	$("#goBack").hide();
 
 	for(var i=0;i<company.length;i++){
-		var div = '<div class="thumbnail"><img src="'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
+		var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
                 $("#thumbnails").append(div);   
         }
 
@@ -179,11 +185,11 @@ $(document).ready(function(){
         });
 
 	//Search technology function
-        /*$("#searchTech").keyup(function(){
+        $("#searchTech").keyup(function(){
                 clearContainer();
                 var search = $("#searchTech").val();
-                filteredResults(company, search, "skills");
-        });*/
+                filteredResults(company, search, "technology");
+        });
 	
 	$("#searchLocation").keyup(function(){
 		clearContainer();
@@ -216,7 +222,7 @@ function filteredResults(company,search, attribute){
                 str = str[attribute];
                 if(str.search(search) > -1){
 
-			var div = '<div class="thumbnail"><img src="'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
+			var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
                         $("#thumbnails").append(div);   
                 }
 
@@ -251,14 +257,14 @@ function filteredResults(company,search, attribute){
     					<thead>
         					<tr>
             						<th style="text-align:center">Category</th>
-            					<!--	<th style="text-align:center">Technology Used</th>-->
+            						<th style="text-align:center">Technology</th>
             						<th style="text-align:center">Location</th>
         					</tr>
     					</thead>
 					<tbody>
 						<tr>
 							<td><input type="text" id="searchCategory"></td>
-					<!--		<td><input type="text" id="searchTech"></td>-->
+							<td><input type="text" id="searchTech"></td>
 							<td><input type="text" id="searchLocation"></td>
 						</tr>
 					<tbody>

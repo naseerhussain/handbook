@@ -152,7 +152,6 @@ else // Not logged in
 
 	<link href="css/smoothState.css" rel="stylesheet">
 
-	<link href="css/main.css" rel="stylesheet">
 
         <script type="text/javascript" charset="utf-8" src="lib/jquery.min.js"></script>
 
@@ -172,147 +171,253 @@ else // Not logged in
 
 <title>New App</title>
 
+<style>
+.thumbnails{
+	float:left;
+}
+	
+.thumbnail{
+	width:30%;
+	height:30%;
+	margin-top:3%;
+	margin-left:2%;
+	float:left;
+	
+}
+
+.well {
+	width:100%;
+	height:100%;
+}
+
+div.thumbnail {
+    position: relative;
+    /*width: 200px;
+    height: 200px;*/
+    background: #F8F8F8;
+    color: #000;
+    padding: 20px;    
+}
+ 
+div.thumbnail:hover {
+    cursor: hand;
+    cursor: pointer;
+    opacity: .9;
+}
+
+a.divLink {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-decoration: none;
+    z-index: 10;
+    background-color: white;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+/*
+a.remove1{
+    cursor: pointer;
+    width:10%;
+    display: block;
+    float: right;  
+    z-index: 10;
+    position: absolute; /*newly added*/
+   /* left: 5px; /*newly added*/
+    /*top: 5px;/*
+}
+a.remove2{
+    cursor: pointer;
+    display: block;
+    width:10%;
+    float: right;  
+    z-index: 10;
+    position: absolute; /*newly added*/
+   /* left: 205px; /*newly added*/
+    /*top: 5px;/*
+}*/
+#remove1{
+	/*position:relative;*/
+	top:240px;
+/*	left:20px;*/
+	z-index:10;
+}
+#remove2{
+	top:240px;
+	z-index:10;
+}
+</style>
+
 <script>
-var company = '<?php echo $result; ?>';
-    company = JSON.parse(company);
-
-var getTilesInfo = '<?php echo $topics; ?>';
-    getTilesInfo = JSON.parse(getTilesInfo);
-
-var id = '<?php echo $_SESSION['twitter_id'];?>';
-
-$(document).ready(function(){
+ $(document).ready(function(){
 	$("#goBack").hide();
 	$("#subscribeTopic").hide();
-	$("#filter").hide();
+	var db_results = '<?php echo $result; ?>';
+	db_results = JSON.parse(db_results);
+	var company = db_results;
+	
+	var getTilesInfo = '<?php echo $topics; ?>';
+	getTilesInfo = JSON.parse(getTilesInfo);
+
+	var id = '<?php echo $_SESSION['twitter_id'];?>';
 
 	$("#logout").hide();
 	$("#updateInfo").hide();
 
-
-	$("#goBack").hide();
-
-	if(company.length > 0){
-                //$("#signUpModal").modal('show');
-                $("#updateInfo").show();
-                $("#createProfile").hide();
-        }
-        if(getTilesInfo.length == 0){
-                for(var key in company){
-                        if(company[key].create_list == "yes" && company[key].twitter_id == id){
-                                $("#topicTileModal").modal('show');
-                        }
-                }
-        }
-
-
-        for(var i=0;i<company.length;i++){
+	if(db_results.length > 0){
+		//$("#signUpModal").modal('show');
+		$("#updateInfo").show();
+		$("#createProfile").hide();
+	}
+	if(getTilesInfo.length == 0){
+		for(var key in db_results){
+			if(db_results[key].create_list == "yes" && db_results[key].twitter_id == id){
+				$("#topicTileModal").modal('show');
+			}
+		}
+	}
+/*	
+	for(var i=0;i<company.length;i++){
                 var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
                 $("#thumbnails").append(div);   
         }
+*/
 
-        $(".thumbnail").click(function(){
-                var clicked = $(this).find("a:first").attr("id");
-                var zid = $(this).find("a:first").attr("zid");
-                console.log(clicked);
-                console.log(zid);
-                $("#table").hide();
-                $("#goBack").show();
-		$("#filter").show();
-                clearContainer();               
-                drawTopicsTiles(getTilesInfo, zid);
-        });
+	for(var i=0;i<getTilesInfo.length;i++){
+		var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+
+		$("#thumbnails").append(div);	
+	}
+
+	$(".changes").unbind("mouseenter mouseleave");
+
+	/*$("#remove1").click(function(){
+		
+		alert("edit");
+	})
+	$("#remove2").click(function(){
+		alert("delete");
+	});*/
+	var tileClicked;	
+	$(".remove1").click(function(){
+		event.stopPropagation();
+		tileClicked = $(this).find("img:first").attr("zid");
+		$("#editTopicModal").modal('show');
+
+		for(var i=0;i<getTilesInfo.length;i++){
+			if(getTilesInfo[i].id == tileClicked){
+				$("#editLname").val(getTilesInfo[i].name);
+				$("#editLintent").val(getTilesInfo[i].intent);
+				$("#editLlocation").val(getTilesInfo[i].location);
+				$("#editLabout").val(getTilesInfo[i].about);
+				$('input[name=editLteach][value="'+getTilesInfo[i].canTeach+'"]').prop('checked',true);
+				$('input[name=editLvenue][value="'+getTilesInfo[i].venue+'"]').prop('checked',true);
+				$('input[name=editLrsvp][value="'+getTilesInfo[i].rsvp+'"]').prop('checked',true);
+			}
+		}
+	});
+	$(".remove2").click(function(){
+		event.stopPropagation();
+		tileClicked = $(this).find("img:first").attr("zid");
+		$("#deleteTileModal").modal('show');
+	});
+	$("#searchLocation").keyup(function(){
+		clearContainer();
+		var search = $("#searchCompany").val();
+		filteredResults(getTilesInfo, search, "cName");
+	});	
 	
-	$("#goBack").click(function(){
-                clearContainer();
-                location.reload();      
-        });
+	$("#searchCategory").keyup(function(){
+		clearContainer();
+		var search = $("#searchCategory").val();
+		filteredResults(getTilesInfo, search, "compProduct");
+	});
 
-        $("#searchCategory").keyup(function(){
-                clearContainer();
-                var search = $("#searchCategory").val();
-                filteredResults(company, search, "category");
-        });
+	$("#searchTech").keyup(function(){
+		clearContainer();
+		var search = $("#searchTech").val();
+		filteredResults(getTilesInfo, search, "skills");
+	});
 
-        //Search technology function
-        $("#searchTech").keyup(function(){
-                clearContainer();
-                var search = $("#searchTech").val();
-                filteredResults(company, search, "technology");
-        });
-        
-        $("#searchLocation").keyup(function(){
-                clearContainer();
-                var search = $("#searchLocation").val();
-                filteredResults(company,search,"location");
-        });
+	$(".thumbnail").click(function(){
+		var clicked = $(this).find("a:first").attr("id");
+		var zid = $(this).find("a:first").attr("zid");
+
+		$("#goBack").show();
+		$("#filter").hide();
+		$("#createTopic").hide();
+		$("#subscribeTopic").show();
+	 	clearContainer();
+		showTileInfo(getTilesInfo, db_results,clicked,zid);		
+	});
+
 
 	$("#signUpPopUp").click(function(){
-                $("#myModal").modal('toggle');
-                $("#signUpModal").modal('toggle');
-        });
+		$("#myModal").modal('toggle');
+		$("#signUpModal").modal('toggle');
+	});
 
-        $("#signUp").click(function(){
-                $("#signUpModal").modal('toggle');
-        });
+	$("#signUp").click(function(){
+		$("#signUpModal").modal('toggle');
+	});
 
-        $("#updateInfo").click(function(){
-                //$("#Uname").val(db_results[])
-                $("#updateProfileModal").modal('toggle');
-                $("#Uname").val(company[0].name);
-                $("#Ucategory").val(company[0].category);
-                $("#Ulocation").val(company[0].location);
-		$("#Utechnology").val(company[0].technology);
-                $("#Uabout").val(company[0].about);
-                
-                if(company[0].create_list == "yes"){
-                        $("#Uyes").prop('checked',true);
-                }else{
-                        $("#Uno").prop('checked',true);
-                }
+	$("#updateInfo").click(function(){
+		//$("#Uname").val(db_results[])
+		$("#updateProfileModal").modal('toggle');
+		console.log(db_results);
+		$("#Uname").val(db_results[0].name);
+		$("#Ucategory").val(db_results[0].category);
+		$("#Ulocation").val(db_results[0].location);
+		$("#Uabout").val(db_results[0].about);
+		
+		if(db_results[0].create_list == "yes"){
+			$("#Uyes").prop('checked',true);
+		}else{
+			$("#Uno").prop('checked',true);
+		}
 
-        });
+	});
 
-	//Function to update the clicked topic tile
 	$("#updateTile").click(function(){
-                var validate = validateListInfo();
-                
-                var name = $("#editLname").val();
-                var intent = $("#editLintent").val();
-                var loc = $("#editLlocation").val();
-                var abt = $("#editLabout").val();
-                var teach = $("input[name=editLteach]").val();
-                var venue = $("input[name=editLvenue]").val();
-                var rsvp = $("input[name=editLrsvp]").val();
+		var validate = validateListInfo();
+		
+		var name = $("#editLname").val();
+		var intent = $("#editLintent").val();
+		var loc = $("#editLlocation").val();
+		var abt = $("#editLabout").val();
+		var teach = $("input[name=editLteach]").val();
+		var venue = $("input[name=editLvenue]").val();
+		var rsvp = $("input[name=editLrsvp]").val();
 
-                if(validate){
-                        $("#editTopicModal").modal('hide');
-                }else{
-                        return false;
-                }
-                //call updaeTileInfo.php file
-                if (window.XMLHttpRequest) {
-                        // code for IE7+, Firefox, Chrome, Opera, Safari
+		if(validate){
+			$("#editTopicModal").modal('hide');
+		}else{
+			return false;
+		}
+		//call updaeTileInfo.php file
+		if (window.XMLHttpRequest) {
+                	// code for IE7+, Firefox, Chrome, Opera, Safari
                         xmlhttp = new XMLHttpRequest();
                 } else {
                        // code for IE6, IE5
                        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                 }
                 xmlhttp.onreadystatechange = function() {
-                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        	//document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
                                 console.log(xmlhttp.responseText);
                         }
                 }
-                xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&location="+loc+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
+		xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&location="+loc+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
                 xmlhttp.send();
-                location.reload();
+		location.reload();
 
-        });
+	});
 
-	//Function to delete the topic created
 	$("#deleteTile").click(function(){
-                $("#deleteTileModal").modal('hide');
+		$("#deleteTileModal").modal('hide');
                 //call updaeTileInfo.php file
                 if (window.XMLHttpRequest) {
                         // code for IE7+, Firefox, Chrome, Opera, Safari
@@ -331,20 +436,26 @@ $(document).ready(function(){
                 xmlhttp.send();
                 location.reload();
 
-        });
+	});
 
-	//Function to toggle my tiles and all tiles
-        $("input:radio[name=filter]").click(function(){
-                var value = $("input[name='filter']:checked").val();
+	$("input:radio[name=filter]").click(function(){
+		var value = $("input[name='filter']:checked").val();
+		clearContainer();
+
+		drawTiles(getTilesInfo, id);
+	});
+
+	$("#goBack").click(function(){
                 clearContainer();
-
-                drawTiles(getTilesInfo, id, value);
+		$("#createTopic").show();
+		$("#subscribeTopic").hide();
+		$("#goBack").hide();
+                location.reload();      
         });
 	
-	//Function to subscribe to this topic
 	$("#subscribe").click(function(){
-                var email = $("#email").val();
-                if (window.XMLHttpRequest) {
+		var email = $("#email").val();
+		if (window.XMLHttpRequest) {
                         // code for IE7+, Firefox, Chrome, Opera, Safari
                         xmlhttp = new XMLHttpRequest();
                 } else {
@@ -359,243 +470,160 @@ $(document).ready(function(){
                 }
                 xmlhttp.open("GET","subscribe.php?id="+tileClicked+"&twitter_id="+id+"&email="+email, true);
                 xmlhttp.send();
-                
-        });
-
 		
+	});
 
-});
+ });
 
-function clearContainer(){
-        $("div .thumbnail").remove();
-}
 
-function drawTopicsTiles(getTilesInfo, zid){
+function drawTiles(getTilesInfo, id){
 	
 	for(var i=0;i<getTilesInfo.length;i++){
-                if(getTilesInfo[i].twitter_id == id){
-                        
-                        var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
-                }else{
-                        
-                        var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
+		if(getTilesInfo[i].twitter_id == id){
+			
+			var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+		}else{
+			
+			var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
 
-                }
+		}
 
                 $("#thumbnails").append(div); 
-        }
+	}
+}
+
+function showTileInfo(getTilesInfo, company, clicked, zid){
+		
+	for(var k=0;k<company.length;k++){
+		for(var i=0;i<getTilesInfo.length;i++){
+			if(company[k].twitter_id == getTilesInfo[i].twitter_id){
+				if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
+					var div = '<div class="thumbnail" style="width:90%;margin-left:5%;"><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].twitter_id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
+
+
+
+/*
+<p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
+*/					$("#thumbnails").append(div);
+				}
+			}
+		}
+	}
+
+}
+
+function getInfo(){
+	var jTable = localStorage.getItem("jobBase") || {};
+	
+	if(Object.size(jTable) > 0){
+		jTable = JSON.parse(jTable);
+	}
+	return jTable;
+}
+
+function filteredResults(getTilesInfo,search, attribute){
+	var size = Object.key(getTilesInfo);
+	
+	for(var i=1;i<=size;i++){
+		var str =getTilesInfo[i];
+		str = str[attribute];
+		if(str.search(search) > -1){
+
+			var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+
+			$("#thumbnails").append(div);	
+		}
+
+
+	}
+}
+
+function clearContainer(){
+	$("div .thumbnail").remove();
+}
 	
 
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
-	$(".thumbnail").click(function(){
-		var clicked = $(this).find("a:first").attr("id");
-                var zid = $(this).find("a:first").attr("zid");
+Object.key = function(obj){
+        var size = 0;
 
-                $("#goBack").show();
-                $("#filter").hide();
-                $("#createTopic").hide();
-                $("#subscribeTopic").show();
-                clearContainer();
-                showTileInfo(getTilesInfo, company,clicked,zid);    
-		
-	});
- 
-	// Function for editing the topic tiles
-	var tileClicked;        
-        $(".remove1").click(function(){
-                event.stopPropagation();
-                tileClicked = $(this).find("img:first").attr("zid");
-		editTopicInfo(tileClicked);
-        });
-
-	// Function for deleting the topic tile
-        $(".remove2").click(function(){
-                event.stopPropagation();
-                tileClicked = $(this).find("img:first").attr("zid");
-                $("#deleteTileModal").modal('show');
-        });
-
-}
-//Function will fill the topic tile information in editTopicModal 
-function editTopicInfo(tileClicked){
-	 $("#editTopicModal").modal('show');
-
-                for(var i=0;i<getTilesInfo.length;i++){
-                        if(getTilesInfo[i].id == tileClicked){
-                                $("#editLname").val(getTilesInfo[i].name);
-                                $("#editLintent").val(getTilesInfo[i].intent);
-                                $("#editLlocation").val(getTilesInfo[i].location);
-                                $("#editLabout").val(getTilesInfo[i].about);
-                                $('input[name=editLteach][value="'+getTilesInfo[i].canTeach+'"]').prop('checked',true);
-                                $('input[name=editLvenue][value="'+getTilesInfo[i].venue+'"]').prop('checked',true);
-                                $('input[name=editLrsvp][value="'+getTilesInfo[i].rsvp+'"]').prop('checked',true);
-                        }
-                }
-
-}
-
-// Function to display the filtered results after selecting the radio button "All Tiles" and "My Tiles""
-function drawTiles(getTilesInfo, id, value){
-        
-        for(var i=0;i<getTilesInfo.length;i++){
-                if(getTilesInfo[i].twitter_id == id){
-                        
-                        var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
-                }else{
-       
-			if(value == "yes"){                 
-                        	var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
-			}
-
-                }
-
-                $("#thumbnails").append(div); 
+        for(key in obj){
+                size= key;
         }
-
-	$(".thumbnail").click(function(){
-                var clicked = $(this).find("a:first").attr("id");
-                var zid = $(this).find("a:first").attr("zid");
-
-                $("#goBack").show();
-                $("#filter").hide();
-                $("#createTopic").hide();
-                $("#subscribeTopic").show();
-                clearContainer();
-                showTileInfo(getTilesInfo, company,clicked,zid);             
-        });
-
-	var tileClicked;        
-	//Function to call edit function of topic tiles
-        $(".remove1").click(function(){
-                event.stopPropagation();
-                tileClicked = $(this).find("img:first").attr("zid");
-                editTopicInfo(tileClicked);
-	});
-
-	 // Function for deleting the topic tile
-        $(".remove2").click(function(){
-                event.stopPropagation();
-                tileClicked = $(this).find("img:first").attr("zid");
-                $("#deleteTileModal").modal('show');
-        });
-
-
+        return size;
 }
 
-
-
-function filteredResults(company,search, attribute){
-        
-        for(var i=0;i<company.length;i++){
-                var str = company[i];
-                str = str[attribute];
-                if(str.search(search) > -1){
-
-                        var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
-                        $("#thumbnails").append(div);   
-                }
-
-
-        }
-        $(".thumbnail").click(function(){
-                var clicked = $(this).find("a:first").attr("id");
-                var zid = $(this).find("a:first").attr("zid");
-                console.log(clicked);
-                console.log(zid);
-                $("#table").hide();
-                $("#goBack").show();
-                clearContainer();               
-                drawTopicsTiles(getTilesInfo, zid);
-        });
-
-}
-
-//This function displays the topic information in full detail 
-function showTileInfo(getTilesInfo, company, clicked, zid){
-                
-        for(var k=0;k<company.length;k++){
-                for(var i=0;i<getTilesInfo.length;i++){
-                        if(company[k].twitter_id == getTilesInfo[i].twitter_id){
-                                if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
-                                        var div = '<div class="thumbnail" style="width:90%;margin-left:5%;"><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].twitter_id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
-
-
-                                      $("#thumbnails").append(div);
-                                }
-                        }
-                }
-        }
-
-}
-
-//Validation function for company create and edit modals 
 function validation(){
-        var name = $("#name").val() || $("#Uname").val();
-        var category = $("#category").val() || $("#Ucategory").val();
-        var loc = $("#location").val() || $("#Ulocation").val();
-        var tech = $("#technology").val() || $("#Utechnology").val();
-        var abt = $("#about").val() || $("#Uabout").val();
-        var file = $("#file").val() || $("#Ufile").val();
-        
-        if(name == ""){
-                alert("Please enter the name ");
-                return false;
-        }       
-        
-        if(category == ""){
-                alert("Please enter the category");
-                return false;
-        }
-        
-        if(tech == ""){
-                alert("Please Enter the technology used");
-                return false;
-        }
-        
-        if(loc == ""){
-                alert("Please enter the location");
-                return false;
-        }
+	var name = $("#name").val() || $("#Uname").val();
+	var category = $("#category").val() || $("#Ucategory").val();
+	var loc = $("#location").val() || $("#Ulocation").val();
+	var tech = $("#technology").val() || $("#Utechnology").val();
+	var abt = $("#about").val() || $("#Uabout").val();
+	var file = $("#file").val() || $("#Ufile").val();
+	
+	if(name == ""){
+		alert("Please enter the name ");
+		return false;
+	}	
+	
+	if(category == ""){
+		alert("Please enter the category");
+		return false;
+	}
+	
+	if(tech == ""){
+		alert("Please Enter the technology used");
+		return false;
+	}
+	
+	if(loc == ""){
+		alert("Please enter the location");
+		return false;
+	}
 
-        if(abt == ""){
-                alert("Please enter about");
-                return false;
-        }
-        
-        if(file == ""){
-                alert("Upload a image file or company logo");
-                return false;
-        }
-        return true;
+	if(abt == ""){
+		alert("Please enter about");
+		return false;
+	}
+	
+	if(file == ""){
+		alert("Upload a image file or company logo");
+		return false;
+	}
+	return true;
 }
 
-
-//Function to validate the topic tile create and edit modal
 function validateListInfo(){
-        var name = $("#lname").val() || $("#editLname").val();
-        var intent = $("#lintent").val() || $("#editLintent").val();
-        var abt = $("#labout").val() || $("#editLabout").val();
-        var loc = $("#llocation").val() || $("#editLlocation").val();
-        
-        if(name == ""){
-                alert("Please Enter the name");
-                return false;
-        }
-        if(intent == ""){
-                alert("Please enter the intent");
-                return false;
-        }
-        if(loc == ""){
-                alert("Please Enter the location");
-                return false;
-        }
-        if(abt == ""){
-                alert("Please enter the about");
-                return false;
-        }
-        return true;
+	var name = $("#lname").val() || $("#editLname").val();
+	var intent = $("#lintent").val() || $("#editLintent").val();
+	var abt = $("#labout").val() || $("#editLabout").val();
+	var loc = $("#llocation").val() || $("#editLlocation").val();
+	
+	if(name == ""){
+		alert("Please Enter the name");
+		return false;
+	}
+	if(intent == ""){
+		alert("Please enter the intent");
+		return false;
+	}
+	if(loc == ""){
+		alert("Please Enter the location");
+		return false;
+	}
+	if(abt == ""){
+		alert("Please enter the about");
+		return false;
+	}
+	return true;
 }
-
 
 </script>
 </head>
@@ -613,7 +641,7 @@ function validateListInfo(){
 
 	<!--	<button class="btn btn-sm pull-right btn-primary" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>-->
 		<div class="row" style="margin-top:5%">
-			<div class="col" id="table">
+		<!--	<div class="col">
 				<table class="table table-condensed" style="text-align:center;">
     					<thead>
         					<tr>
@@ -630,7 +658,7 @@ function validateListInfo(){
 						</tr>
 					<tbody>
 				</table>
-			</div>
+			</div>-->
 			<div id="filter">
 				<label >Show : </label>&nbsp;&nbsp;
                                 <label><input type="radio" name="filter" value="yes" checked>All Tiles</label>&nbsp;&nbsp;

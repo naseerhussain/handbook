@@ -1,7 +1,9 @@
 <?PHP
 
 	session_start();	
-	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+	 $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+
 
 
 	if(! $conn){
@@ -10,6 +12,7 @@
 
 	$name = $_POST['name'];
 	$category = $_POST['category'];
+	$tech = $_POST['technology'];
 	$loc = $_POST['location'];
 	$abt = $_POST['about'];
 	$id = $_SESSION['twitter_id'];
@@ -33,16 +36,15 @@
 
 	exec("find uploads/ -type f -exec chmod 0777 {} +");
 	
-	$sql ="INSERT INTO company(id,name,twitter_id,category,location,about,create_list) VALUES (NULL,'$name','$id','$category','$loc','$abt','$list')";
+	$sql ="INSERT INTO company(id,name,twitter_id,category,technology,location,about,create_list) VALUES (NULL,'$name','$id','$category','$tech','$loc','$abt','$list')";
 	mysql_select_db('handbook');
+//	mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );
 
 	if (! $insert) {
         	die('Could not enter data: ' . mysql_error());
 	} else {
-    		echo "Data entered successfully";
+		mysql_close($conn);
+		header('Location: mypage.php');
 	}
-
-	mysql_close($conn);
-	header('Location: mypage.php');
 ?>

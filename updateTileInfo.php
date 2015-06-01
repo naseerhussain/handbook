@@ -1,5 +1,7 @@
 <?PHP
 $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+
 
 
 if(! $conn){
@@ -21,6 +23,7 @@ echo $name,$intent,$abt,$teach,$venue,$rsvp,$id,$twitter_id;
 
 $sql ="UPDATE topics SET name = '$name' ,intent='$intent',location='$loc', about ='$abt' ,canTeach ='$teach',venue='$venue',rsvp='$rsvp' WHERE twitter_id='$twitter_id' AND id='$id'";
 mysql_select_db('handbook');
+//mysql_select_db('bookmane_handbook');
 $insert = mysql_query( $sql, $conn );
 
 

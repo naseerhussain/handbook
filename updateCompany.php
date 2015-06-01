@@ -2,6 +2,8 @@
 
 	session_start();	
 	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+
 
 
 	if(! $conn){
@@ -10,6 +12,7 @@
 
 	$name = $_POST['Uname'];
 	$category = $_POST['Ucategory'];
+	$tech = $_POST['Utechnology'];
 	$loc = $_POST['Ulocation'];
 	$abt = $_POST['Uabout'];
 	$id = $_SESSION['twitter_id'];
@@ -28,8 +31,9 @@
 	$picname1=$_FILES['Ufile']['name'];	
 
 	
-	$sql ="UPDATE company SET name = '$name' ,category='$category',location ='$loc' ,about ='$abt',image_url='$picname1',create_list='$list' WHERE twitter_id='$id'";
+	$sql ="UPDATE company SET name = '$name' ,category='$category',technology='$tech',location ='$loc' ,about ='$abt',image_url='$picname1',create_list='$list' WHERE twitter_id='$id'";
 	mysql_select_db('handbook');
+//	mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );
 
 	//if (! $insert) {
