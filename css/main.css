@@ -3,7 +3,7 @@
 }
 
 .thumbnail{
-        width:30%;
+        width:25%;
         height:30%;
         margin-top:3%;
         margin-left:2%;
@@ -17,6 +17,7 @@
 }
 
 div.thumbnail {
+    width:70%
     position: relative;
     /*width: 200px;
     height: 200px;*/
@@ -32,7 +33,7 @@ div.thumbnail:hover {
 }
 
 a.divLink {
-    position: absolute;
+    position: relative;
     width: 100%;
     height: 100%;
     top: 0;
@@ -70,8 +71,17 @@ a.remove2{
 /*      left:20px;*/
         z-index:10;
 }
+
 #remove2{
         top:240px;
         z-index:10;
 }
+#compEdit, #compDelete{
+	z-index:10;
+}
 
+#footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

@@ -3,8 +3,8 @@
         require_once('toJson.php');
         session_start();
 
-                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-//		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+                //$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -14,8 +14,8 @@
                 $query = 'select *from company';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
                 //$query ='select *from company';
-                mysql_select_db('handbook');
-	//	mysql_select_db('bookmane_handbook');
+//                mysql_select_db('handbook');
+		mysql_select_db('bookmane_handbook');
                 $retval = mysql_query( $query, $conn );
                 if(! $retval )
                 {
@@ -36,8 +36,8 @@
         require_once('toJson.php');
         session_start();
 
-                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-//		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+       //         $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -47,8 +47,8 @@
                 $sql = 'select *from topics';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
                 //$query ='select *from company';
-                mysql_select_db('handbook');
-		//mysql_select_db('bookmane_handbook');
+//                mysql_select_db('handbook');
+		mysql_select_db('bookmane_handbook');
                 $ret = mysql_query( $sql, $conn );
 
                 if(! $ret )
@@ -158,7 +158,7 @@ $(document).ready(function(){
 	$("#goBack").hide();
 
 	for(var i=0;i<company.length;i++){
-		var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
+		var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
                 $("#thumbnails").append(div);   
         }
 
@@ -170,11 +170,11 @@ $(document).ready(function(){
 		$("#table").hide();
 		$("#goBack").show();
 		clearContainer();		
-		drawTopicsTiles(getTilesInfo, zid);
+		drawTopicsTiles(getTilesInfo, zid, clicked);
         });
 
-	$("#goBack").click(function(){
-		clearContainer();
+	$("#crowdlearn").click(function(){
+	//	clearContainer();
 		location.reload();	
 	});
 
@@ -203,13 +203,13 @@ function clearContainer(){
         $("div .thumbnail").remove();
 }
 
-function drawTopicsTiles(getTilesInfo, zid){
+function drawTopicsTiles(getTilesInfo, zid, clicked){
 
 	for(var i=0;i<getTilesInfo.length;i++){
-		if(getTilesInfo[i].twitter_id == zid){
+		if(getTilesInfo[i].twitter_id == zid && getTilesInfo[i].companyName == clicked){
 			 var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
 
-                $("#thumbnails").append(div);   
+	                $("#thumbnails").append(div);   
 
 		}
 	}	
@@ -221,8 +221,8 @@ function filteredResults(company,search, attribute){
                 var str = company[i];
                 str = str[attribute];
                 if(str.search(search) > -1){
+			var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
 
-			var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
                         $("#thumbnails").append(div);   
                 }
 
@@ -246,11 +246,12 @@ function filteredResults(company,search, attribute){
 </head>
 <body>
 	<div class="container">
-		<br><br>
-		<button class="btn btn-sm pull-left btn-info" style="margin-right:2%;" id="goBack">Go Back</button>
+		<br>
+		<!--<button class="btn btn-sm pull-left btn-info" style="margin-right:2%;" id="goBack">Go Back</button>-->
+		<a id="crowdlearn" style="cursor:hand;margin-top:45px;position:absolute;">Crowdlearn</a><br>
 
 
-		<button class="btn btn-sm pull-right btn-success" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>
+		<a class="pull-right" style="margin-right:2%;margin-top:25px" data-toggle="modal" data-target="#myModal">Sign In</a>
 		<div class="row" style="margin-top:5%">
 			<div class="col">
 				<table class="table table-condensed" style="text-align:center;" id="table">

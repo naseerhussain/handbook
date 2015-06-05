@@ -13,7 +13,7 @@ if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether u
         echo "<br/><a href='logout.php'>Logout</a>";
         //header('Location: main.php');*/
 
-        //$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//        $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
 	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
@@ -162,8 +162,6 @@ else // Not logged in
 
 	<script type="text/javascript" src="lib/masonry.pkgd.min.js"></script>
 
-<!--	<script type="text/javascript" src="lib/activate.masonry.js"></script>-->
-
 <!--	<script type="text/javascript" src="lib/jquery.smoothState.js"></script>
 
 	<script type="text/javscript" src="lib/function.js"></script>
@@ -173,11 +171,7 @@ else // Not logged in
 	<script type="text/javascript" src="lib/bootstrap-modal.js"></script>-->
 
 <title>New App</title>
-<style>
-#crowdlearn:hover{
-	cursor:hand;
-}
-</style>
+
 <script>
 var company = '<?php echo $result; ?>';
     company = JSON.parse(company);
@@ -188,134 +182,104 @@ var getTilesInfo = '<?php echo $topics; ?>';
 var id = '<?php echo $_SESSION['twitter_id'];?>';
 
 $(document).ready(function(){
-	$("#mylistTabMenu").hide();
-	for(var i=0;i<company.length;i++){
-                var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+company[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+company[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+	$("#goBack").hide();
+	$("#subscribeTopic").hide();
+	$("#filter").hide();
+
+	$("#logout").hide();
+	$("#updateInfo").hide();
+
+
+	$("#goBack").hide();
+
+	if(company.length > 0){
+                //$("#signUpModal").modal('show');
+                $("#updateInfo").show();
+                $("#createProfile").hide();
+        }
+        if(getTilesInfo.length == 0){
+                for(var key in company){
+                        if(company[key].create_list == "yes" && company[key].twitter_id == id){
+                                $("#topicTileModal").modal('show');
+                        }
+                }
+        }
+
+
+        for(var i=0;i<company.length;i++){
+                var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
                 $("#thumbnails").append(div);   
         }
-	
-	$(".thumbnail").click(function(){
+
+        $(".thumbnail").click(function(){
                 var clicked = $(this).find("a:first").attr("id");
                 var zid = $(this).find("a:first").attr("zid");
-
-		$("#mylistTabMenu").show();
-		$("#company-tab").removeClass('active');
-		$("#mylist-tab").addClass('active');
-		$("#mylistTabMenu").addClass('active');
-		$("#companyTabMenu").removeClass('active');
-		//-showTileInfo(getTilesInfo, company,clicked,zid);  
-		drawTiles(getTilesInfo, zid, clicked);
-	});
+                console.log(clicked);
+                console.log(zid);
+                $("#table").hide();
+                $("#goBack").show();
+		$("#filter").show();
+                clearContainer();               
+                drawTopicsTiles(getTilesInfo, zid);
+        });
 	
-
-	var compClicked;        
-        $(".remove1").click(function(){
-                event.stopPropagation();
-                compClicked = $(this).find("img:first").attr("zid");
-                $("#updateProfileModal").modal('show');
-		
-		for(var i=0;i<company.length;i++){
-			if(company[i].id == compClicked){
-				$("#Uname").val(company[i].name);
-				$("#Ucategory").val(company[i].category);
-				$("#Ulocation").val(company[i].location);
-				$("#Utechnology").val(company[i].technology);
-				$("#Uabout").val(company[i].about);
-				$('input[name=optradio][value="'+company[i].create_list+'"]').prop('checked',true);
-				
-			}
-		}
-	});
-
-	 // Function for deleting the topic tile
-        $(".remove2").click(function(){
-                event.stopPropagation();
-                tileClicked = $(this).find("img:first").attr("zid");
-                $("#deleteCompTileModal").modal('show');
+	$("#goBack").click(function(){
+                clearContainer();
+                location.reload();      
         });
 
+        $("#searchCategory").keyup(function(){
+                clearContainer();
+                var search = $("#searchCategory").val();
+                filteredResults(company, search, "category");
+        });
 
-	$("#companyTabMenu").click(function(){
-		$("#mylistTabMenu").hide();
-		$("#companyTabMenu").addClass('active');
-		//$("#")
-		location.reload();
-	});
+        //Search technology function
+        $("#searchTech").keyup(function(){
+                clearContainer();
+                var search = $("#searchTech").val();
+                filteredResults(company, search, "technology");
+        });
+        
+        $("#searchLocation").keyup(function(){
+                clearContainer();
+                var search = $("#searchLocation").val();
+                filteredResults(company,search,"location");
+        });
 
-	$("#crowdlearn").click(function(){
-		location.reload();
-	});
+	$("#signUpPopUp").click(function(){
+                $("#myModal").modal('toggle');
+                $("#signUpModal").modal('toggle');
+        });
 
-	//Function to update the company profile
-	$("#updateProfile").click(function(){
-		var validate = validation();
-		
-		var name = $("#Uname").val();
-		var cat = $("#Ucategory").val();
-		var loc = $("#Ulocation").val();
-		var tech = $("#Utechnology").val();
-		var comp = $("#Uabout").val();
-		var list = $("input[name=optradio]").val();
+        $("#signUp").click(function(){
+                $("#signUpModal").modal('toggle');
+        });
 
-		if(validate){
-                        $("#editTopicModal").modal('hide');
+        $("#updateInfo").click(function(){
+                //$("#Uname").val(db_results[])
+                $("#updateProfileModal").modal('toggle');
+                $("#Uname").val(company[0].name);
+                $("#Ucategory").val(company[0].category);
+                $("#Ulocation").val(company[0].location);
+		$("#Utechnology").val(company[0].technology);
+                $("#Uabout").val(company[0].about);
+                
+                if(company[0].create_list == "yes"){
+                        $("#Uyes").prop('checked',true);
                 }else{
-                        return false;
+                        $("#Uno").prop('checked',true);
                 }
-
-		 //call updaeCompany.php file
-                if (window.XMLHttpRequest) {
-                        // code for IE7+, Firefox, Chrome, Opera, Safari
-                        xmlhttp = new XMLHttpRequest();
-                } else {
-                       // code for IE6, IE5
-                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-                }
-                xmlhttp.onreadystatechange = function() {
-                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
-                                console.log(xmlhttp.responseText);
-                        }
-                }
-                xmlhttp.open("GET","updateCompany.php?name="+name+"&category="+cat+"&location="+loc+"&tech="+tech+"&comp="+comp+"&createList="+list+"id="+compClicked+"&twitter_id="+id, true);
-                xmlhttp.send();
-                location.reload();
-
-	
-	});
-
-	// Delete company tiles 
-         $("#deleteCompTile").click(function(){
-                $("#deleteCompTileModal").modal('hide');
-                //call updaeTileInfo.php file
-                if (window.XMLHttpRequest) {
-                        // code for IE7+, Firefox, Chrome, Opera, Safari
-                        xmlhttp = new XMLHttpRequest();
-                } else {
-                       // code for IE6, IE5
-                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-                }
-                xmlhttp.onreadystatechange = function() {
-                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
-                                console.log(xmlhttp.responseText);
-                        }
-                }
-                xmlhttp.open("GET","deleteCompany.php?id="+compClicked+"&twitter_id="+id, true);
-                xmlhttp.send();
-                location.reload();
 
         });
-		
 
-	// Edit topic Tiles
+	//Function to update the clicked topic tile
 	$("#updateTile").click(function(){
                 var validate = validateListInfo();
                 
                 var name = $("#editLname").val();
                 var intent = $("#editLintent").val();
                 var loc = $("#editLlocation").val();
-		var comp = $("#editLcompany").val();
                 var abt = $("#editLabout").val();
                 var teach = $("input[name=editLteach]").val();
                 var venue = $("input[name=editLvenue]").val();
@@ -340,14 +304,14 @@ $(document).ready(function(){
                                 console.log(xmlhttp.responseText);
                         }
                 }
-                xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&location="+loc+"&comp="+comp+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
+                xmlhttp.open("GET","updateTileInfo.php?name="+name+"&intent="+intent+"&location="+loc+"&abt="+abt+"&teach="+teach+"&venue="+venue+"&rsvp="+rsvp+"&id="+tileClicked+"&twitter_id="+id, true);
                 xmlhttp.send();
                 location.reload();
 
         });
 
-	// Delete topic tiles 
-	 $("#deleteTile").click(function(){
+	//Function to delete the topic created
+	$("#deleteTile").click(function(){
                 $("#deleteTileModal").modal('hide');
                 //call updaeTileInfo.php file
                 if (window.XMLHttpRequest) {
@@ -369,7 +333,36 @@ $(document).ready(function(){
 
         });
 
+	//Function to toggle my tiles and all tiles
+        $("input:radio[name=filter]").click(function(){
+                var value = $("input[name='filter']:checked").val();
+                clearContainer();
+
+                drawTiles(getTilesInfo, id, value);
+        });
 	
+	//Function to subscribe to this topic
+	$("#subscribe").click(function(){
+                var email = $("#email").val();
+                if (window.XMLHttpRequest) {
+                        // code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+                xmlhttp.open("GET","subscribe.php?id="+tileClicked+"&twitter_id="+id+"&email="+email, true);
+                xmlhttp.send();
+                
+        });
+
+		
 
 });
 
@@ -377,29 +370,55 @@ function clearContainer(){
         $("div .thumbnail").remove();
 }
 
-//Function to draw company topic tiles
-function drawTiles(getTilesInfo, id, cName){
-        
-        for(var i=0;i<getTilesInfo.length;i++){
-		var div = "";
-                if(getTilesInfo[i].twitter_id == id && getTilesInfo[i].companyName == cName){
+function drawTopicsTiles(getTilesInfo, zid){
+	
+	for(var i=0;i<getTilesInfo.length;i++){
+                if(getTilesInfo[i].twitter_id == id){
                         
-                         div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
-                } /*else{
+                        var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+                }else{
                         
                         var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
 
-                }*/
-		if(div != ""){
-                	$("#list-thumbnails").append(div); 
-		}
-        }
+                }
 
-	 var tileClicked;        
+                $("#thumbnails").append(div); 
+        }
+	
+
+
+	$(".thumbnail").click(function(){
+		var clicked = $(this).find("a:first").attr("id");
+                var zid = $(this).find("a:first").attr("zid");
+
+                $("#goBack").show();
+                $("#filter").hide();
+                $("#createTopic").hide();
+                $("#subscribeTopic").show();
+                clearContainer();
+                showTileInfo(getTilesInfo, company,clicked,zid);    
+		
+	});
+ 
+	// Function for editing the topic tiles
+	var tileClicked;        
         $(".remove1").click(function(){
                 event.stopPropagation();
                 tileClicked = $(this).find("img:first").attr("zid");
-                $("#editTopicModal").modal('show');
+		editTopicInfo(tileClicked);
+        });
+
+	// Function for deleting the topic tile
+        $(".remove2").click(function(){
+                event.stopPropagation();
+                tileClicked = $(this).find("img:first").attr("zid");
+                $("#deleteTileModal").modal('show');
+        });
+
+}
+//Function will fill the topic tile information in editTopicModal 
+function editTopicInfo(tileClicked){
+	 $("#editTopicModal").modal('show');
 
                 for(var i=0;i<getTilesInfo.length;i++){
                         if(getTilesInfo[i].id == tileClicked){
@@ -412,20 +431,104 @@ function drawTiles(getTilesInfo, id, cName){
                                 $('input[name=editLrsvp][value="'+getTilesInfo[i].rsvp+'"]').prop('checked',true);
                         }
                 }
+
+}
+
+// Function to display the filtered results after selecting the radio button "All Tiles" and "My Tiles""
+function drawTiles(getTilesInfo, id, value){
+        
+        for(var i=0;i<getTilesInfo.length;i++){
+                if(getTilesInfo[i].twitter_id == id){
+                        
+                        var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+                }else{
+       
+			if(value == "yes"){                 
+                        	var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
+			}
+
+                }
+
+                $("#thumbnails").append(div); 
+        }
+
+	$(".thumbnail").click(function(){
+                var clicked = $(this).find("a:first").attr("id");
+                var zid = $(this).find("a:first").attr("zid");
+
+                $("#goBack").show();
+                $("#filter").hide();
+                $("#createTopic").hide();
+                $("#subscribeTopic").show();
+                clearContainer();
+                showTileInfo(getTilesInfo, company,clicked,zid);             
         });
+
+	var tileClicked;        
+	//Function to call edit function of topic tiles
+        $(".remove1").click(function(){
+                event.stopPropagation();
+                tileClicked = $(this).find("img:first").attr("zid");
+                editTopicInfo(tileClicked);
+	});
+
+	 // Function for deleting the topic tile
         $(".remove2").click(function(){
                 event.stopPropagation();
                 tileClicked = $(this).find("img:first").attr("zid");
                 $("#deleteTileModal").modal('show');
         });
 
-	
-
 
 }
 
 
-//Validation function for creating and updating company profile
+
+function filteredResults(company,search, attribute){
+        
+        for(var i=0;i<company.length;i++){
+                var str = company[i];
+                str = str[attribute];
+                if(str.search(search) > -1){
+
+                        var div = '<div class="thumbnail"><img src="uploads/'+company[i].twitter_id+'" height="100%" width="100%"><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
+                        $("#thumbnails").append(div);   
+                }
+
+
+        }
+        $(".thumbnail").click(function(){
+                var clicked = $(this).find("a:first").attr("id");
+                var zid = $(this).find("a:first").attr("zid");
+                console.log(clicked);
+                console.log(zid);
+                $("#table").hide();
+                $("#goBack").show();
+                clearContainer();               
+                drawTopicsTiles(getTilesInfo, zid);
+        });
+
+}
+
+//This function displays the topic information in full detail 
+function showTileInfo(getTilesInfo, company, clicked, zid){
+                
+        for(var k=0;k<company.length;k++){
+                for(var i=0;i<getTilesInfo.length;i++){
+                        if(company[k].twitter_id == getTilesInfo[i].twitter_id){
+                                if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
+                                        var div = '<div class="thumbnail" style="width:90%;margin-left:5%;"><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].twitter_id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
+
+
+                                      $("#thumbnails").append(div);
+                                }
+                        }
+                }
+        }
+
+}
+
+//Validation function for company create and edit modals 
 function validation(){
         var name = $("#name").val() || $("#Uname").val();
         var category = $("#category").val() || $("#Ucategory").val();
@@ -463,16 +566,16 @@ function validation(){
                 alert("Upload a image file or company logo");
                 return false;
         }
-	  return true;
+        return true;
 }
 
-// Function for validating the create and update list
+
+//Function to validate the topic tile create and edit modal
 function validateListInfo(){
         var name = $("#lname").val() || $("#editLname").val();
         var intent = $("#lintent").val() || $("#editLintent").val();
         var abt = $("#labout").val() || $("#editLabout").val();
         var loc = $("#llocation").val() || $("#editLlocation").val();
-	var comp = $("#lcompany").val() || $("#editLcompany").val();
         
         if(name == ""){
                 alert("Please Enter the name");
@@ -490,89 +593,110 @@ function validateListInfo(){
                 alert("Please enter the about");
                 return false;
         }
-	if(comp == ""){
-		alert("Please enter the company name related to this topic");
-		return false;
-	}
         return true;
 }
-
-
 
 
 </script>
 </head>
 <body>
-<div class="container">
-	<br><br>
-	<a id="crowdlearn" style="cursor:hand;margin-top:45px;position:absolute;">Crowdlearn</a><br>
+	<div class="container">
+		<br><br>
+		<a href="logout.php" class="btn btn-sm btn-danger pull-right">Log Out <?php echo $_SESSION['name'];?></a>
+		<!--<a href="createTile.html" id="create" class="btn btn-sm pull-right btn-primary" style="margin-right:2%;">Create</a>-->
 
-	<ul id="tabs" class="nav nav-tabs pull-right" data-tabs="tabs">
-        	<li class="active" id="companyTabMenu"><a href="#company-tab" data-toggle="tab" id="company">Company</a></li>
-        	<li id="mylistTabMenu"><a href="#mylist-tab" data-toggle="tab" id="mylist">My List</a></li>
-		<li><a  href="logout.php"  aria-expanded="false">Logout</a></li>
+		<button class="btn btn-sm pull-right btn-info" id="updateInfo" data-target="#updateProfileModal" style="margin-right:2%;">Update Profile</button>
 		
-        </ul>
-	<br>
+		<button class="btn btn=sm pull-right btn-info" data-toggle="modal" id="createProfile" data-target="#signUpModal" style="margin-right:2%;">Create Profile</button>
 
-        <div id="my-tab-content" class="tab-content" style="margin-left:10%;">
-            <div class="tab-pane active" id="company-tab">
-			<br><br>
-			<div class="col">
-                                <table class="table table-condensed" style="text-align:center;">
-                                        <thead>
-                                                <tr>
-                                                        <th style="text-align:center">Category</th>
-                                                        <th style="text-align:center">Technology Used</th>
-                                                        <th style="text-align:center">Location</th>
-                                                </tr>
-                                        </thead>
-                                        <tbody>
-                                                <tr>
-                                                        <td><input type="text" id="searchCategory"></td>
-                                                        <td><input type="text" id="searchTech"></td> 
-                                                        <td><input type="text" id="searchLocation"></td>
-                                                </tr>
-                                        <tbody>
-                                </table>
-                        </div>
+		<button class="btn btn-sm pull-left btn-info" id="createTopic" data-toggle="modal" data-target="#topicTileModal" style="margin-right:2%;">Create Topic/Subject</button>
 
-			
-			<a style="margin-left:-150px;margin-top:70px;position:absolute" id="addCompany" data-toggle="modal" data-target="#signUpModal">Add Company</a><br>
-			<div class="row" style="margin-top:5%; background-color:#E0E0E0;">
-                	        <div class = "tiles">
-                        	        <!--<div class="tiles-li col-sm-6 col-md-4 col-lg-3"><div class="well">3<br>product</div></div>-->
-                                	<div class="masonry-container" id="thumbnails">
-                                	</div>
-                        	</div>
-                	</div>
+	<!--	<button class="btn btn-sm pull-right btn-primary" style="margin-right:2%;" data-toggle="modal" data-target="#myModal">Sign In</button>-->
+		<div class="row" style="margin-top:5%">
+			<div class="col" id="table">
+				<table class="table table-condensed" style="text-align:center;">
+    					<thead>
+        					<tr>
+            						<th style="text-align:center">Category</th>
+            						<th style="text-align:center">Technology Used</th>
+							<th style="text-align:center">Location</th>
+        					</tr>
+    					</thead>
+					<tbody>
+						<tr>
+							<td><input type="text" id="searchCategory"></td>
+							<td><input type="text" id="searchTech"></td> 
+							<td><input type="text" id="searchLocation"></td>
+						</tr>
+					<tbody>
+				</table>
+			</div>
+			<div id="filter">
+				<label >Show : </label>&nbsp;&nbsp;
+                                <label><input type="radio" name="filter" value="yes" checked>All Tiles</label>&nbsp;&nbsp;
+                                <label><input type="radio" name="filter" value="no">My Tiles</label>
+			</div>
+			<button class="btn btn-sm pull-left btn-info" style="margin-right:2%;" id="goBack">Go Back</button>
+			<div id="subscribeTopic" class="pull-right">
+				<label>Subscribe :</label>
+				<input type="text" class="input-sm" placeholder="E-mail Id" id="email" >&nbsp;&nbsp;
+				<button id="subscribe" class="btn btn-sm btn-success">Subscribe</button>
+			</div>
 
-            </div>
-            <div class="tab-pane" id="mylist-tab">
-			<br><br>
-			<legend></legend>
-			<a style="margin-left:-150px;position:absolute;margin-top:35px;" id="addTopic" data-toggle="modal" data-target="#topicTileModal" >Add List</a>
-			<div class="row" style="margin-top:5%; background-color:#E0E0E0;width:90%;">
-                                <div class = "tiles">
-                                        <!--<div class="tiles-li col-sm-6 col-md-4 col-lg-3"><div class="well">3<br>product</div></div>-->
-                                        <div class="masonry-container" id="list-thumbnails">
-                                        </div>
+		</div>
+		<div class="row" style="margin-top:2%; background-color:#E0E0E0;">
+			<div class = "tiles">
+				<!--<div class="tiles-li col-sm-6 col-md-4 col-lg-3"><div class="well">3<br>product</div></div>-->
+				<div class="masonry-container" id="thumbnails">
+				</div>  
+			</div>
+		</div>
+
+		<!-- SIDN IN THROUGH TWITTER MODAL-->
+		<div id="myModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+
+    		<!-- Modal content-->
+    			<div class="modal-content" style="width:50%;">
+      				<div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+        				<button type="button" class="close" data-dismiss="modal">&times;</button>
+        				<h4 class="modal-title" style="color:white">Sign In</h4>
+      				</div>
+      				<div class="modal-body">
+					<a href="login.php"><img src="images/tw_login.png"></a>
+      				</div>
+      				<div class="modal-footer">
+        				<!--<button type="button" class="btn btn-primary" id="signIn" >Sign In</button>-->
+      				</div>
+    			</div>
+
+  		</div>
+		</div>		
+		
+		<!-- DELETE SUBJECT/TOPIC TILE MODAL-->
+                <div id="deleteTileModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+
+                        <div class="modal-content" style="width:50%;">
+                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title" style="color:white">Confirm Delete</h4>
+                                </div>
+                                <div class="modal-body">
+					Are You sure to delete this Subject/Topic ?
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="deleteTile" >Delete</button>
                                 </div>
                         </div>
-			<div style="background-color:#ccffcc;width:90%;">
-			<div  id="footer" class="jumbotron-overlay-up">
-				<label>Subscribe :</label>
-                                <input type="text" class="input-sm" placeholder="E-mail Id" id="email" >&nbsp;&nbsp;
-                                <button id="subscribe" class="btn btn-sm btn-success">Subscribe</button>
-			</div>
-			</div>
-            </div>
-	</div>
 
-</div>
+                </div>
+                </div>
 
- <!-- SIGN UP COMPANY DETAILS MODAL-->
-                <div id="signUpModal" class="modal fade" role="dialog">
+
+
+		<!-- SIGN UP COMPANY DETAILS MODAL-->
+		<div id="signUpModal" class="modal fade" role="dialog">
                   <div class="modal-dialog">
 
                 <!-- Modal content-->
@@ -582,41 +706,40 @@ function validateListInfo(){
                                         <h4 class="modal-title" style="color:white">Sign Up</h4>
                                 </div>
                                 <div class="modal-body">
-                                        <p id="error"></p>
-                                        <form method="post" action="saveCompany.php" enctype="multipart/form-data" onsubmit="return validation();">
+					<p id="error"></p>
+					<form method="post" action="saveCompany.php" enctype="multipart/form-data" onsubmit="return validation();">
                                                 <label class="block">Name :</label><br>
                                                 <input type="text" name="name" id="name" class="block" style="width:100%;"><br>
                                                 <label class="block">What Category :</label><br>
                                                 <input type="text" name="category" id="category" class="block" style="width:100%;"><br>
-                                                <label class="block">Technology Used : </label><br>
-                                                <input class="text" name="technology" id="technology" class="block" style="width:100%;"><br>
-                                                <label>Location : </label><br>
-                                                <input type="text" name="location" id="location" class="block" style="width:100%"><br>
-                                                <label>About : </label><br>
-                                                <textarea id="about" name="about" style="width:100%" rows=5></textarea><br>
-                                                <label style="width:100%" class="block">Will Create the list : <label>
-                                                <div class="radio">
-                                                        <label><input type="radio" name="optradio" value="yes" checked>Yes</label>
-                                                        <label><input type="radio" name="optradio" value="no">No</label>
-                                                </div>
-                                                <div>
-                                                        <span><label>Upload Company Logo/Other Image :</label></span>
-                                                        <span><input type="file" id="file" name="file"/></span><br>
-                                                        <!-- <span><input type="submit" value="ADD"  style="float: left;" ></span>-->
-                                                </div>
-                                                <input type="submit" value="Save Info" class="btn btn-primary pull-right" >
+						<label class="block">Technology Used : </label><br>
+						<input class="text" name="technology" id="technology" class="block" style="width:100%;"><br>
+						<label>Location : </label><br>
+						<input type="text" name="location" id="location" class="block" style="width:100%"><br>
+						<label>About : </label><br>
+						<textarea id="about" name="about" style="width:100%" rows=5></textarea><br>
+						<label style="width:100%" class="block">Will Create the list : <label>
+					 	<div class="radio">
+  							<label><input type="radio" name="optradio" value="yes" checked>Yes</label>
+  							<label><input type="radio" name="optradio" value="no">No</label>
+						</div>	
+						<div>
+						    	<span><label>Upload Company Logo/Other Image :</label></span>
+						    	<span><input type="file" id="file" name="file"/></span><br>
+						    	<!-- <span><input type="submit" value="ADD"  style="float: left;" ></span>-->
+						</div>
+						<input type="submit" value="Save Info" class="btn btn-primary pull-right" >
                                         </form>
-
-				 </div>
+                                </div>
                                 <div class="modal-footer">
-                                         <!--<button type="submit" class="btn btn-primary" id="signUp" >Sign Up</button>-->
+	                                 <!--<button type="submit" class="btn btn-primary" id="signUp" >Sign Up</button>-->
                                 </div>
                         </div>
 
-                </div>
+                </div>  
                 </div>
 
-  <!-- UPDATE COMPANY DETAILS MODAL-->
+		 <!-- UPDATE COMPANY DETAILS MODAL-->
                 <div id="updateProfileModal" class="modal fade" role="dialog">
                   <div class="modal-dialog">
 
@@ -628,15 +751,14 @@ function validateListInfo(){
                                 </div>
                                 <div class="modal-body">
                                         <p id="error"></p>
-                                        <!--<form method="post" action="updateCompany.php" enctype="multipart/form-data" onsubmit="return validation();">-->
-					<form>
+                                        <form method="post" action="updateCompany.php" enctype="multipart/form-data" onsubmit="return validation();">
                                                 <label class="block">Name :</label><br>
                                                 <input type="text" name="Uname" id="Uname" class="block" style="width:100%;"><br>
                                                 <label class="block">What Category :</label><br>
                                                 <input type="text" name="Ucategory" id="Ucategory" class="block" style="width:100%;"><br>
                                                 <label>Location : </label><br>
                                                 <input type="text" name="Ulocation" id="Ulocation" class="block" style="width:100%"><br>
-                                                <label>Technology Used : </label><br>
+						<label>Technology Used : </label><br>
                                                 <input class="text" name="Utechnology" id="Utechnology" class="block" style="width:100%;"><br>
                                                 <label>About : </label><br>
                                                 <textarea id="Uabout" name="Uabout" style="width:100%" rows=5></textarea><br>
@@ -645,23 +767,23 @@ function validateListInfo(){
                                                         <label><input type="radio" name="optradio" id="Uyes" value="yes" checked>Yes</label>
                                                         <label><input type="radio" name="optradio" id="Uno" value="no">No</label>
                                                 </div>
-                                                <!--<div>
+                                                <div>
                                                         <span><label>Upload Company Logo/Other Image :</label></span>
                                                         <span><input type="file" id="Ufile" name="Ufile"/></span><br>
-                                                        <span><input type="submit" value="ADD"  style="float: left;" ></span>
-                                                </div>-->
-                                             <!--   <input type="submit" value="Update Profile" class="btn btn-primary pull-right" >-->
+                                                        <!-- <span><input type="submit" value="ADD"  style="float: left;" ></span>-->
+                                                </div>
+                                                <input type="submit" value="Update Profile" class="btn btn-primary pull-right" >
                                         </form>
                                 </div>
                                 <div class="modal-footer">
                                          <!--<button type="submit" class="btn btn-primary" id="signUp" >Sign Up</button>-->
-					<button type="button" id="updateProfile" class="btn btn-sm btn-primary" >Update Profile</button>
                                 </div>
-			</div>
-                </div>
-                </div>
+                        </div>
+		</div>
+		</div>
 
-	 <!-- CREATE TILE FOR SUBJECT/TOPIC LIST-->
+
+		<!-- CREATE TILE FOR SUBJECT/TOPIC LIST-->
                 <div id="topicTileModal" class="modal fade" role="dialog">
                   <div class="modal-dialog">
 
@@ -672,37 +794,35 @@ function validateListInfo(){
                                         <h4 class="modal-title" style="color:white">Create Subject/Topic</h4>
                                 </div>
                                 <div class="modal-body">
-                                        <form method="post" action="saveTopic.php" enctype="multipart/form-data" onsubmit="return validateListInfo();">
-                                                <label class="block">Topic/Subject Name :</label><br>
+					<form method="post" action="saveTopic.php" enctype="multipart/form-data" onsubmit="return validateListInfo();">
+						<label class="block">Topic/Subject Name :</label><br>
                                                 <input type="text" name="lname" id="lname" class="block" style="width:100%;"><br>
                                                 <label class="block">Intent :</label><br>
                                                 <input type="text" name="lintent" id="lintent" class="block" style="width:100%;"><br>
-                                                <label class="block">Location :</label><br>
-                                                <input type="text" name="llocation" id="llocation" class="block" style="width:100%;"><br>
-						<label class="block">Company :</label><br>
-						<input type="text" name="lcompany" id="lcompany" class="block" style="width:100%;"><br>
-                                                <label>About the Topic/Subject : </label><br>
+						<label class="block">Location</label><br>
+						<input type="text" name="llocation" id="llocation" class="block" style="width:100%;"><br>
+						<label>About the Topic/Subject : </label><br>
                                                 <textarea id="labout" name="labout" style="width:100%" rows=5></textarea><br>
-
-                                                <label>Others can teach this : </label>&nbsp;&nbsp;
-                                                <!-- <div class="radio">-->
+						
+						<label>Others can teach this : </label>&nbsp;&nbsp;
+						<!-- <div class="radio">-->
                                                         <label><input type="radio" name="teach" value="yes" checked>Yes</label>&nbsp;&nbsp;
                                                         <label><input type="radio" name="teach" value="no">No</label>
                                                 <!--</div>-->
-                                                <br><label >Venue : </label>
-                                                <!--<div class="radio">-->
+						<br><label >Venue : </label>
+						<!--<div class="radio">-->
                                                         <label><input type="radio" name="venue" value="Not Available" checked>To be Decided</label>&nbsp;&nbsp;
                                                         <label><input type="radio" name="venue" value="Available" >Available</label>
                                                 <!--</div>-->
-                                                <br><label >Create RSVP : </label>&nbsp;&nbsp;
-                                                <!--<div class="radio" style="width:100%">-->
+						<br><label >Create RSVP : </label>&nbsp;&nbsp;
+						<!--<div class="radio" style="width:100%">-->
                                                         <label><input type="radio" name="rsvp" value="yes" checked>Yes</label>&nbsp;&nbsp;
                                                         <label><input type="radio" name="rsvp" value="no">No</label>
                                                 <!--</div><br>-->
-                                                <br><br><input type="submit" value="Save Info" class="btn btn-primary pull-right" >
+						<br><br><input type="submit" value="Save Info" class="btn btn-primary pull-right" >
 
-                                        </form>
-				 </div>
+					</form>
+                                </div>
                                 <div class="modal-footer">
                                         <!--<button type="button" class="btn btn-primary" id="signIn" >Sign In</button>-->
                                 </div>
@@ -710,8 +830,8 @@ function validateListInfo(){
 
                 </div>
                 </div>
-	
- <!-- EDIT TILE FOR SUBJECT/TOPIC LIST-->
+		
+		 <!-- EDIT TILE FOR SUBJECT/TOPIC LIST-->
                 <div id="editTopicModal" class="modal fade" role="dialog">
                   <div class="modal-dialog">
 
@@ -723,15 +843,13 @@ function validateListInfo(){
                                 </div>
                                 <div class="modal-body">
                                        <!-- <form method="post" action="saveTopic.php" enctype="multipart/form-data" onsubmit="return validateListInfo();">-->
-                                        <form>
+					<form>
                                                 <label class="block">Topic/Subject Name :</label><br>
                                                 <input type="text" name="editLname" id="editLname" class="block" style="width:100%;"><br>
                                                 <label class="block">Intent :</label><br>
                                                 <input type="text" name="editLintent" id="editLintent" class="block" style="width:100%;"><br>
-                                                <label class="block">Location :</label><br>
-                                                <input type="text" name="editLlocation" id="editLlocation" class="block" style="width:100%;"><br>
-						<label class="block">Company :</label><br>
-						<input type="text" name="editLcompany" id="editLcompany" class="block" style="width:100%;"><br>
+						<label class="block">Location :</label><br>
+						<input type="text" name="editLlocation" id="editLlocation" class="block" style="width:100%;"><br>
                                                 <label>About the Topic/Subject : </label><br>
                                                 <textarea id="editLabout" name="editLabout" style="width:100%" rows=5></textarea><br>
                                                 <label>Others can teach this : </label>&nbsp;&nbsp;
@@ -752,9 +870,8 @@ function validateListInfo(){
                                               <!--  <br><br><input type="submit" value="Update topic" class="btn btn-primary pull-right" >-->
 
                                         </form>
-                                                                                	
-				 </div>
-                                 <div class="modal-footer">
+                                </div>
+				 <div class="modal-footer">
                                         <button type="button" id="updateTile" class="btn btn-sm btn-primary" >Update Info</button>
                                 </div>
                         </div>
@@ -762,27 +879,8 @@ function validateListInfo(){
                 </div>
                 </div>
 
-		<!-- DELETE COMPANY TILE MODAL-->
-                <div id="deleteCompTileModal" class="modal fade" role="dialog">
-                  <div class="modal-dialog">
-
-                        <div class="modal-content" style="width:50%;">
-                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title" style="color:white">Confirm Delete</h4>
-                                </div>
-                                <div class="modal-body">
-                                        Are You sure to delete this Company Profile ?
-                                </div>
-                                <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary" id="deleteCompTile" >Delete</button>
-                                </div>
-                        </div>
-
-                </div>
-                </div>
-
-
-
+				
+	
+	</div>
 </body>
 </html>
