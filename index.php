@@ -3,8 +3,8 @@
         require_once('toJson.php');
         session_start();
 
-                //$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+		//$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -14,8 +14,8 @@
                 $query = 'select *from company';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
                 //$query ='select *from company';
-//                mysql_select_db('handbook');
-		mysql_select_db('bookmane_handbook');
+                mysql_select_db('handbook');
+		//mysql_select_db('bookmane_handbook');
                 $retval = mysql_query( $query, $conn );
                 if(! $retval )
                 {
@@ -36,8 +36,8 @@
         require_once('toJson.php');
         session_start();
 
-       //         $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -47,8 +47,8 @@
                 $sql = 'select *from topics';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
                 //$query ='select *from company';
-//                mysql_select_db('handbook');
-		mysql_select_db('bookmane_handbook');
+                mysql_select_db('handbook');
+		//mysql_select_db('bookmane_handbook');
                 $ret = mysql_query( $sql, $conn );
 
                 if(! $ret )

@@ -13,8 +13,8 @@ if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether u
         echo "<br/><a href='logout.php'>Logout</a>";
         //header('Location: main.php');*/
 
-        //$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+	//$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -27,8 +27,8 @@ if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether u
         $name = $_SESSION['name'];
 
         $sql = "INSERT INTO users(id,twitter_id,name)VALUES(NULL,'$id','$name')";
-        mysql_select_db('bookmane_handbook');
-//	mysql_select_db("handbook");
+        //mysql_select_db('bookmane_handbook');
+	mysql_select_db("handbook");
         $insert = mysql_query( $sql, $conn );
         mysql_close($conn); 
 }
@@ -73,8 +73,8 @@ else // Not logged in
 
 	if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether user already logged in with twitter
 	{
-//		$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+		$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -84,8 +84,8 @@ else // Not logged in
 		$query = 'select *from company where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
 		//$query ='select *from company';
-		mysql_select_db('bookmane_handbook');
-	//	mysql_select_db("handbook");
+	//	mysql_select_db('bookmane_handbook');
+		mysql_select_db("handbook");
 	        $retval = mysql_query( $query, $conn );
 		if(! $retval )
 		{
@@ -109,8 +109,8 @@ else // Not logged in
 
         if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether user already logged in with twitter
         {
-          //      $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-		$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+	//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -120,8 +120,8 @@ else // Not logged in
                 $sql = 'select *from topics';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
                 //$query ='select *from company';
-                mysql_select_db('bookmane_handbook');
-	//	mysql_select_db("handbook");
+         //       mysql_select_db('bookmane_handbook');
+		mysql_select_db("handbook");
 
                 $ret = mysql_query( $sql, $conn );
 
@@ -369,6 +369,27 @@ $(document).ready(function(){
 
         });
 
+	//Search functionality for the company tiles
+	$("#searchCategory").keyup(function(){
+                clearContainer();
+                var search = $("#searchCategory").val();
+                filteredResults(company, search, "category");
+        });
+
+        //Search technology function
+        $("#searchTech").keyup(function(){
+                clearContainer();
+                var search = $("#searchTech").val();
+                filteredResults(company, search, "technology");
+        });
+        
+        $("#searchLocation").keyup(function(){
+                clearContainer();
+                var search = $("#searchLocation").val();
+                filteredResults(company,search,"location");
+        });
+
+
 	
 
 });
@@ -423,6 +444,35 @@ function drawTiles(getTilesInfo, id, cName){
 
 
 }
+
+//Generate search filter results
+function filteredResults(company,search, attribute){
+        
+        for(var i=0;i<company.length;i++){
+                var str = company[i];
+                str = str[attribute];
+                if(str.search(search) > -1){
+			var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+company[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+company[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+
+                        $("#thumbnails").append(div);   
+                }
+
+
+        }
+        $(".thumbnail").click(function(){
+                var clicked = $(this).find("a:first").attr("id");
+                var zid = $(this).find("a:first").attr("zid");
+                console.log(clicked);
+                console.log(zid);
+                $("#table").hide();
+                $("#goBack").show();
+                clearContainer();               
+                drawTiles(getTilesInfo, zid, clicked);
+        });
+
+}
+
+
 
 
 //Validation function for creating and updating company profile

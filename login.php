@@ -14,8 +14,8 @@ if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether u
 	//header('Location: main.php');*/
 	
 	echo "<br/><a href='logout.php'>Logout</a>";
-//	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -28,8 +28,8 @@ if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether u
 	$name = $_SESSION['name'];
 	
 	$sql = "INSERT INTO users(id,twitter_id,name)VALUES(NULL,'$id','$name')";
-//	mysql_select_db('handbook');
-	mysql_select_db('bookmane_handbook');
+	mysql_select_db('handbook');
+	//mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );
 	mysql_close($conn); 
 }

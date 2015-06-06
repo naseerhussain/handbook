@@ -1,8 +1,8 @@
 <?PHP
 
 	session_start();	
-//	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
-	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+	$conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
 
 
 
@@ -33,8 +33,8 @@
 
 	
 	$sql ="UPDATE company SET name = '$name' ,category='$category',technology='$tech',location ='$loc' ,about ='$abt',create_list='$list' WHERE twitter_id='$id'";
-//	mysql_select_db('handbook');
-	mysql_select_db('bookmane_handbook');
+	mysql_select_db('handbook');
+//	mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );
 
 	//if (! $insert) {

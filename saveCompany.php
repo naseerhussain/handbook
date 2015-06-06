@@ -1,8 +1,8 @@
 <?PHP
 
 	session_start();	
-	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
-//	 $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+//	$conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+	 $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
 
 
 
@@ -22,8 +22,8 @@
 	}
 
 	$sql ="INSERT INTO company(id,name,twitter_id,category,technology,location,about,create_list) VALUES (NULL,'$name','$id','$category','$tech','$loc','$abt','$list')";
- //       mysql_select_db('handbook');
-	mysql_select_db('bookmane_handbook');
+        mysql_select_db('handbook');
+	//mysql_select_db('bookmane_handbook');
         $insert = mysql_query( $sql, $conn );
 
 
@@ -38,7 +38,7 @@
 //	$temp = $id ;
 	$temp = mysql_insert_id();
 	// Path and file name
-	$pathAndName = "uploads/".$fileName;
+	//$pathAndName = "uploads/".$fileName;
 	rename($pathAndName,$temp);
 	move_uploaded_file($fileTmpLoc, "uploads/".$temp);
 
