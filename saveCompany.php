@@ -11,6 +11,7 @@
 	}
 
 	$name = $_POST['name'];
+	$email = $_POST['email'];
 	$category = $_POST['category'];
 	$tech = $_POST['technology'];
 	$loc = $_POST['location'];
@@ -21,7 +22,7 @@
 		$list = $_POST['optradio'];
 	}
 
-	$sql ="INSERT INTO company(id,name,twitter_id,category,technology,location,about,create_list) VALUES (NULL,'$name','$id','$category','$tech','$loc','$abt','$list')";
+	$sql ="INSERT INTO company(id,name,email,twitter_id,category,technology,location,about,createList) VALUES (NULL,'$name','$email','$id','$category','$tech','$loc','$abt','$list')";
         mysql_select_db('handbook');
 	//mysql_select_db('bookmane_handbook');
         $insert = mysql_query( $sql, $conn );

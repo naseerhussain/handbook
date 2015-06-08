@@ -10,13 +10,15 @@
         	die("Connection failed: " . mysql_error());
 	}
 
-	$name = $_GET['Uname']; //$_POST['Uname'];
-	$category = $_GET['Ucategory']; //$_POST['Ucategory'];
-	$tech = $_GET['Utechnology']; //$_POST['Utechnology'];
-	$loc = $_GET['Ulocation']; //$_POST['Ulocation'];
-	$abt = $_GET['Uabout']; //$_POST['Uabout'];
-	$id = $_GET['twitter_id']; //$_SESSION['twitter_id'];
+	$name = $_GET['name']; //$_POST['Uname'];
+	$email = $_GET['email'];
+	$category = $_GET['category']; //$_POST['Ucategory'];
+	$tech = $_GET['tech']; //$_POST['Utechnology'];
+	$loc = $_GET['location']; //$_POST['Ulocation'];
+	$abt = $_GET['about']; //$_POST['Uabout'];
+	$tid = $_GET['twitter_id']; //$_SESSION['twitter_id'];
 	$list = $_GET['createList'];
+	$cid = $_GET['id'];
 
 	//if(isset($_POST['optradio'])){
 	//	$list = $_POST['optradio'];
@@ -32,7 +34,7 @@
 //	$picname1=$_FILES['Ufile']['name'];	
 
 	
-	$sql ="UPDATE company SET name = '$name' ,category='$category',technology='$tech',location ='$loc' ,about ='$abt',create_list='$list' WHERE twitter_id='$id'";
+	$sql ="UPDATE company SET name = '$name',email='$email' ,category='$category',technology='$tech',location ='$loc' ,about ='$abt',createList='$list' WHERE twitter_id='$id' AND id='$cid'";
 	mysql_select_db('handbook');
 //	mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );

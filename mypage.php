@@ -154,15 +154,17 @@ else // Not logged in
 
 	<link href="css/main.css" rel="stylesheet">
 
+	<link href="css/overlay-bootstrap.min.css" rel="stylesheet">
+
         <script type="text/javascript" charset="utf-8" src="lib/jquery.min.js"></script>
 
 	<script type="text/javascript" src="lib/bootstrap.min.js"></script>
 
-<!--	<script type="text/javscript" src="lib/bootstrap-dialog.js"></script>-->
-
 	<script type="text/javascript" src="lib/masonry.pkgd.min.js"></script>
 
-<!--	<script type="text/javascript" src="lib/activate.masonry.js"></script>-->
+	<script type="text/javascript" src="lib/bootstrap-tooltip.js"></script>
+	
+	<script type="text/javascript" src="lib/bootstrap-popover.js"></script>
 
 <!--	<script type="text/javascript" src="lib/jquery.smoothState.js"></script>
 
@@ -251,6 +253,7 @@ $(document).ready(function(){
 		var validate = validation();
 		
 		var name = $("#Uname").val();
+		var email = $("#Uemail").val();
 		var cat = $("#Ucategory").val();
 		var loc = $("#Ulocation").val();
 		var tech = $("#Utechnology").val();
@@ -277,7 +280,7 @@ $(document).ready(function(){
                                 console.log(xmlhttp.responseText);
                         }
                 }
-                xmlhttp.open("GET","updateCompany.php?name="+name+"&category="+cat+"&location="+loc+"&tech="+tech+"&comp="+comp+"&createList="+list+"id="+compClicked+"&twitter_id="+id, true);
+                xmlhttp.open("GET","updateCompany.php?name="+name+"&email="+email+"&category="+cat+"&location="+loc+"&tech="+tech+"&about="+comp+"&createList="+list+"id="+compClicked+"&twitter_id="+id, true);
                 xmlhttp.send();
                 location.reload();
 
@@ -390,8 +393,6 @@ $(document).ready(function(){
         });
 
 
-	
-
 });
 
 function clearContainer(){
@@ -405,7 +406,12 @@ function drawTiles(getTilesInfo, id, cName){
 		var div = "";
                 if(getTilesInfo[i].twitter_id == id && getTilesInfo[i].companyName == cName){
                         
-                         div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+                         div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend></legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:-10px;"></a>';
+
+			if(getTilesInfo[i].rsvp=="yes"){
+				div += '<img src="images/attend1.png" zid="'+getTilesInfo[i].id+'" id="rsvpattend" title="Join RSVP" class="attendRSVP" width="45" height="25" style="margin-left:30%;margin-top:-25px;" >';
+			}
+			div += '<a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:-10px;"></a></div></div>';
                 } /*else{
                         
                         var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';
@@ -415,6 +421,8 @@ function drawTiles(getTilesInfo, id, cName){
                 	$("#list-thumbnails").append(div); 
 		}
         }
+
+	var element = '<div class="well"><p>Something something</p><br><button class="btn btn-sm btn-primary">Attend</button></div>';
 
 	 var tileClicked;        
         $(".remove1").click(function(){
@@ -439,6 +447,54 @@ function drawTiles(getTilesInfo, id, cName){
                 tileClicked = $(this).find("img:first").attr("zid");
                 $("#deleteTileModal").modal('show');
         });
+
+ 	var zid;
+	$("#rsvpattend").click(function(){
+		event.stopPropagation();
+		zid = $(this).attr('zid');
+		console.log("clicked");
+		$("#attendRsvpModal").modal('toggle');
+	});
+	
+	$("#attendRSVP").click(function(){
+		var email = $("#rsvpEmail").val();
+
+		if(email == ""){
+			return false;
+		}else{
+			$("#attendRsvpModal").modal('toggle');
+		}
+
+		 //call attendRsvp.php file
+                if (window.XMLHttpRequest) {
+                        // code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+                xmlhttp.open("GET","attendRsvp.php?email="+email+"&twitter_id="+id+"&zid="+zid, true);
+                xmlhttp.send();
+                //location.reload();
+
+		
+	});
+
+	 $(".thumbnail").click(function(){
+                var clicked = $(this).find("a:first").attr("id");
+                var zid = $(this).find("a:first").attr("zid");
+
+                clearContainer();
+                showTileInfo(getTilesInfo, company,clicked,zid);    
+                
+        });
+
 
 	
 
@@ -472,12 +528,30 @@ function filteredResults(company,search, attribute){
 
 }
 
+//This function displays the topic information in full detail 
+function showTileInfo(getTilesInfo, company, clicked, zid){
+                
+        for(var k=0;k<company.length;k++){
+                for(var i=0;i<getTilesInfo.length;i++){
+                        if(company[k].twitter_id == getTilesInfo[i].twitter_id && company[k].name == getTilesInfo[i].companyName){
+                                if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
+                                        var div = '<div class="thumbnail" style="width:90%;margin-left:5%;"><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
+
+
+                            	        $("#topicTileClicked").append(div);
+                                }
+                        }
+                }
+        }
+
+}
 
 
 
 //Validation function for creating and updating company profile
 function validation(){
         var name = $("#name").val() || $("#Uname").val();
+	var email = $("#email").val() || $("#Uemail").val();
         var category = $("#category").val() || $("#Ucategory").val();
         var loc = $("#location").val() || $("#Ulocation").val();
         var tech = $("#technology").val() || $("#Utechnology").val();
@@ -487,7 +561,12 @@ function validation(){
         if(name == ""){
                 alert("Please enter the name ");
                 return false;
-        }       
+        }      
+
+	if(email == ""){
+		alert("Please enter the email");
+		return false;
+	} 
         
         if(category == ""){
                 alert("Please enter the category");
@@ -612,10 +691,11 @@ function validateListInfo(){
 			<div style="background-color:#ccffcc;width:90%;">
 			<div  id="footer" class="jumbotron-overlay-up">
 				<label>Subscribe :</label>
-                                <input type="text" class="input-sm" placeholder="E-mail Id" id="email" >&nbsp;&nbsp;
+                                <input type="text" class="input-sm" placeholder="E-mail Id" id="subscribeEmail" >&nbsp;&nbsp;
                                 <button id="subscribe" class="btn btn-sm btn-success">Subscribe</button>
 			</div>
 			</div>
+			<div id="topicTileClicked" class="my-overlay-trigger"></div>
             </div>
 	</div>
 
@@ -636,6 +716,8 @@ function validateListInfo(){
                                         <form method="post" action="saveCompany.php" enctype="multipart/form-data" onsubmit="return validation();">
                                                 <label class="block">Name :</label><br>
                                                 <input type="text" name="name" id="name" class="block" style="width:100%;"><br>
+						<label class="block">E-mail : </label><br>
+						<input type="text" name="email" id="email" class="block" style="width:100%;"><br>
                                                 <label class="block">What Category :</label><br>
                                                 <input type="text" name="category" id="category" class="block" style="width:100%;"><br>
                                                 <label class="block">Technology Used : </label><br>
@@ -682,6 +764,8 @@ function validateListInfo(){
 					<form>
                                                 <label class="block">Name :</label><br>
                                                 <input type="text" name="Uname" id="Uname" class="block" style="width:100%;"><br>
+						<label class="block">E-mail : </label><br>
+						<input type="text" name="Uemail" id="Uemail" class="bloack" style="width:100%"><br>
                                                 <label class="block">What Category :</label><br>
                                                 <input type="text" name="Ucategory" id="Ucategory" class="block" style="width:100%;"><br>
                                                 <label>Location : </label><br>
@@ -832,6 +916,27 @@ function validateListInfo(){
                 </div>
                 </div>
 
+
+		<!-- ATTEND RSVP MODAL-->
+                <div id="attendRsvpModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+
+                        <div class="modal-content" style="width:50%;">
+                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title" style="color:white">Attend RSVP</h4>
+                                </div>
+                                <div class="modal-body">
+                                        <label>E-mail Id :</label><br>
+					<input type="text" id="rsvpEmail" style="width:100%">
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="attendRSVP" >Attend</button>
+                                </div>
+                        </div>
+
+                </div>
+                </div>
 
 
 </body>

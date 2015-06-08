@@ -67,14 +67,17 @@ a.remove2{
 }*/
 #remove1{
         /*position:relative;*/
-        top:240px;
+        /*top:240px;*/
 /*      left:20px;*/
         z-index:10;
 }
 
 #remove2{
-        top:240px;
+       /* top:240px;*/
         z-index:10;
+}
+#rsvpattend{
+	z-index;
 }
 #compEdit, #compDelete{
 	z-index:10;
@@ -85,3 +88,32 @@ a.remove2{
     bottom: 0;
     width: 100%;
 }
+
+.cancel { 
+	display:block; 
+	position:absolute; 
+	top:3px; 
+	right:2px; 
+	background:rgb(245,245,245); 
+	color:black; height:30px; 
+	width:35px; 
+	font-size:30px; 
+	text-decoration:none; 
+	text-align:center; 
+	font-weight:bold;
+}
+
+#tileInfo { 
+	height:380px; 
+	width:340px; 
+	margin:0 auto; 
+	position:relative; 
+	z-index:10; 
+	display:none; 
+	background: url(login.png) no-repeat; 
+	border:5px solid #cccccc; border-radius:10px; 
+} 
+#tileInfo:target, #tileInfo:target + #cover{ 
+	display:block;
+	opacity:2; 
+} 
