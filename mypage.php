@@ -141,6 +141,44 @@ else // Not logged in
 
 ?>
 
+<?php
+
+        require_once('toJson.php');
+        session_start();
+
+        if(isset($_SESSION['name']) && isset($_SESSION['twitter_id'])) //check whether user already logged in with twitter
+        {
+                $conn = mysql_connect("localhost:3306", "root", "pwd"); // Establishing Connection with Server
+        //      $conn = mysql_connect("bookmane.in", "bookmane_user1", "test123"); // Establishing Connection with Server
+
+
+
+                if(! $conn){
+                        die("Connection failed: " . mysql_error());
+                }
+                $sql2 = 'select *from venueDetails';// where twitter_id ="' . $_SESSION['twitter_id'].'"';
+
+                //$query ='select *from company';
+         //       mysql_select_db('bookmane_handbook');
+                mysql_select_db("handbook");
+
+                $retV = mysql_query( $sql2, $conn );
+
+                if(! $retV )
+                {
+                        die('Could not get data: ' . mysql_error());
+                }
+                $venue = array();
+                while($row = mysql_fetch_array($retV, MYSQL_ASSOC))
+                {
+                        $venue[] = $row;
+                }
+                $venueDetails = json_encode($venue);
+                mysql_close($conn);
+
+	}                                             
+?>
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -186,6 +224,9 @@ var company = '<?php echo $result; ?>';
 
 var getTilesInfo = '<?php echo $topics; ?>';
     getTilesInfo = JSON.parse(getTilesInfo);
+
+var venueDetails = '<?php echo $venueDetails; ?>';
+    venueDetails = JSON.parse(venueDetails);
 
 var id = '<?php echo $_SESSION['twitter_id'];?>';
 
@@ -348,6 +389,74 @@ $(document).ready(function(){
                 location.reload();
 
         });
+	
+	//Function for filling venue details
+	$("input[name=venue]").click(function(){
+		var validate = validateListInfo();
+		
+		if(! validate){
+			return false;
+		}else{
+			var loc = $("#llocation").val();
+			$("#venueCity").val(loc);
+		}
+
+
+		var isAvail = $(this).val();
+		//alert(isAvail);
+		if(isAvail == "Available"){
+			$("#venueModal").modal('toggle');
+		}
+	});
+
+	//Function for editing venue details
+	$("input[name=editLvenue]").click(function(){
+		var validate = validateListInfo();
+
+		if(! validate){
+			return false;
+		}else{
+			var loc = $("#editLlocation").val();
+			$("#editVcity").val(loc);
+		}
+		var isAvail = $(this).val();
+		if(isAvail == "Available"){
+			$("#venueModal").modal('toggle');
+		}
+	});
+	
+	// Save venue details of the RSVP event
+	$("#saveVenue").click(function(){
+		var validate = venueValidation();
+
+		if(! validate){
+			return false;
+		}
+		var vDate = $("#venueDate").val();
+		var vTime = $("#venueTime").val();
+		var vAddress = $("#venueAddress").val();
+		var vCity = $("#venueCity").val();
+		var vCompany = $("#lcompany").val();
+		var vTopic = $("#lname").val();
+
+		//call updaeTileInfo.php file
+                if (window.XMLHttpRequest) {
+                        // code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+                xmlhttp.open("GET","saveVenueDetails.php?vDate="+vDate+"&vTime="+vTime+"&vAddress="+vAddress+"&vCompany="+vCompany+"&vCity="+vCity+"&vTopic="+vTopic+"&twitter_id="+id, true);
+                xmlhttp.send();
+
+	});
 
 	// Delete topic tiles 
 	 $("#deleteTile").click(function(){
@@ -436,6 +545,7 @@ function drawTiles(getTilesInfo, id, cName){
                                 $("#editLintent").val(getTilesInfo[i].intent);
                                 $("#editLlocation").val(getTilesInfo[i].location);
                                 $("#editLabout").val(getTilesInfo[i].about);
+				$("#editLcompany").val(getTilesInfo[i].companyName);
                                 $('input[name=editLteach][value="'+getTilesInfo[i].canTeach+'"]').prop('checked',true);
                                 $('input[name=editLvenue][value="'+getTilesInfo[i].venue+'"]').prop('checked',true);
                                 $('input[name=editLrsvp][value="'+getTilesInfo[i].rsvp+'"]').prop('checked',true);
@@ -627,7 +737,28 @@ function validateListInfo(){
 }
 
 
+function venueValidation(){
+	var vDate = $("#vDate").val() || $("#editVdate").val();
+	var vTime = $("#vTime").val() || $("#editVtime").val();
+	var vAddress = $("vAddress").val() || $("#editVaddress").val();
 
+	if(vDate == ""){
+		alert("Enter Date of the venue");
+		return false;
+	}
+	
+	if(vTime == ""){
+		alert("Enter Time of the venue");
+		return false;
+	}
+	
+	if(vAddress == ""){
+		alert("Enter Address of the venue");
+		return false;
+	}
+
+	return true;
+}
 
 </script>
 </head>
@@ -937,6 +1068,62 @@ function validateListInfo(){
 
                 </div>
                 </div>
+		
+
+		 <!-- RSVP VENUE DETAILS MODAL-->
+                <div id="venueModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+
+                        <div class="modal-content" style="width:50%;">
+                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title" style="color:white">Enter Venue Details</h4>
+                                </div>
+                                <div class="modal-body">
+                                        <label>Venue Date :</label><br>
+                                        <input type="text" id="venueDate" style="width:100%">
+					<label>Venue TIme :</label><br>
+					<input type="text" id="venueTime" style="width:100%">
+					<label>Venue Address :</label><br>
+					<textarea id="venueAddress" rows="4" style="width:100%"></textarea>
+					<label>Venue City : </label><br>
+					<input type="text" id="venueCity" style="width:100%;" disabled> 
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="saveVenue" >Save Venue</button>
+                                </div>
+                        </div>
+
+                </div>
+                </div>
+
+		 <!--EDIT  RSVP VENUE DETAILS MODAL-->
+                <div id="editVenueModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+
+                        <div class="modal-content" style="width:50%;">
+                                <div class="modal-header" style="background-color:#428bca;border-top-left-radius: 4px;border-top-right-radius: 4px">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title" style="color:white">Edit Venue Details</h4>
+                                </div>
+                                <div class="modal-body">
+                                        <label>Venue Date :</label><br>
+                                        <input type="text" id="editVdate" style="width:100%">
+                                        <label>Venue TIme :</label><br>
+                                        <input type="text" id="editVtime" style="width:100%">
+                                        <label>Venue Address :</label><br>
+                                        <textarea id="editVaddress" rows="4" style="width:100%"></textarea>
+                                        <label>Venue City : </label><br>
+                                        <input type="text" id="venueCity" style="width:100%;" disabled>
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="saveVenue" >Save Venue</button>
+                                </div>
+                        </div>
+
+                </div>
+                </div>
+
 
 
 </body>
