@@ -81,9 +81,9 @@ else // Not logged in
 	        if(! $conn){
         	        die("Connection failed: " . mysql_error());
         	}
-		$query = 'select *from company where twitter_id ="' . $_SESSION['twitter_id'].'"';
+		//$query = 'select *from company where twitter_id ="' . $_SESSION['twitter_id'].'"';
 
-		//$query ='select *from company';
+		$query ='select *from company';
 	//	mysql_select_db('bookmane_handbook');
 		mysql_select_db("handbook");
 	        $retval = mysql_query( $query, $conn );
@@ -231,9 +231,30 @@ var venueDetails = '<?php echo $venueDetails; ?>';
 var id = '<?php echo $_SESSION['twitter_id'];?>';
 
 $(document).ready(function(){
-	$("#mylistTabMenu").hide();
+	//$("#mylistTabMenu").hide();
+	var isTile = 0;
+	for(var k=0;k<company.length;k++){
+		for(var i=0;i<getTilesInfo.length;i++){
+			if(getTilesInfo[i].twitter_id == id && company[k].twitter_id == id){
+				isTile += 1;
+			}
+		}
+	}
+
+	for(var k=0;k<company.length;k++){
+		if(company[k].twitter_id == id){
+			if(isTile == 0 && company[k].createList == "yes"){
+				$("#topicTileModal").modal('toggle');
+			}	
+		}
+	}
+
 	for(var i=0;i<company.length;i++){
-                var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+company[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+company[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+		if(company[i].twitter_id == id){
+                	var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+company[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+company[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+		}else{
+			var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p></div>';
+		}
                 $("#thumbnails").append(div);   
         }
 	
@@ -260,6 +281,7 @@ $(document).ready(function(){
 		for(var i=0;i<company.length;i++){
 			if(company[i].id == compClicked){
 				$("#Uname").val(company[i].name);
+				$("#Uemail").val(company[i].email);
 				$("#Ucategory").val(company[i].category);
 				$("#Ulocation").val(company[i].location);
 				$("#Utechnology").val(company[i].technology);
@@ -273,7 +295,7 @@ $(document).ready(function(){
 	 // Function for deleting the topic tile
         $(".remove2").click(function(){
                 event.stopPropagation();
-                tileClicked = $(this).find("img:first").attr("zid");
+                compClicked = $(this).find("img:first").attr("zid");
                 $("#deleteCompTileModal").modal('show');
         });
 
@@ -455,6 +477,7 @@ $(document).ready(function(){
                 }
                 xmlhttp.open("GET","saveVenueDetails.php?vDate="+vDate+"&vTime="+vTime+"&vAddress="+vAddress+"&vCompany="+vCompany+"&vCity="+vCity+"&vTopic="+vTopic+"&twitter_id="+id, true);
                 xmlhttp.send();
+		$("#venueModal").modal('toggle');
 
 	});
 
@@ -518,7 +541,7 @@ function drawTiles(getTilesInfo, id, cName){
                          div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend></legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:-10px;"></a>';
 
 			if(getTilesInfo[i].rsvp=="yes"){
-				div += '<img src="images/attend1.png" zid="'+getTilesInfo[i].id+'" id="rsvpattend" title="Join RSVP" class="attendRSVP" width="45" height="25" style="margin-left:30%;margin-top:-25px;" >';
+				div += '<img src="images/attend1.png" zid="'+getTilesInfo[i].id+'" cid="'+getTilesInfo[i].companyName+'" tid="'+getTilesInfo[i].name+'" id="rsvpattend" title="Join RSVP" class="attendRSVP" width="45" height="25" style="margin-left:30%;margin-top:-25px;" >';
 			}
 			div += '<a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:-10px;"></a></div></div>';
                 } /*else{
@@ -531,7 +554,6 @@ function drawTiles(getTilesInfo, id, cName){
 		}
         }
 
-	var element = '<div class="well"><p>Something something</p><br><button class="btn btn-sm btn-primary">Attend</button></div>';
 
 	 var tileClicked;        
         $(".remove1").click(function(){
@@ -562,7 +584,18 @@ function drawTiles(getTilesInfo, id, cName){
 	$("#rsvpattend").click(function(){
 		event.stopPropagation();
 		zid = $(this).attr('zid');
+		var tid = $(this).attr('tid');
+		var cid = $(this).attr('cid');
 		console.log("clicked");
+		for(var i=0;i<venueDetails.length;i++){
+                        if(tid == venueDetails[i].topic && cid == venueDetails[i].company){
+                                $("#rsvpDate").text("Date : "+venueDetails[i].date);
+                                $("#rsvpTime").text("Time : "+venueDetails[i].time);
+                                $("#rsvpAddress").text("Address : "+venueDetails[i].address);
+                                $("#rsvpCity").text("City : "+venueDetails[i].city);
+                        }
+                }
+
 		$("#attendRsvpModal").modal('toggle');
 	});
 	
@@ -738,9 +771,9 @@ function validateListInfo(){
 
 
 function venueValidation(){
-	var vDate = $("#vDate").val() || $("#editVdate").val();
-	var vTime = $("#vTime").val() || $("#editVtime").val();
-	var vAddress = $("vAddress").val() || $("#editVaddress").val();
+	var vDate = $("#venueDate").val() || $("#editVdate").val();
+	var vTime = $("#venueTime").val() || $("#editVtime").val();
+	var vAddress = $("#venueAddress").val() || $("#editVaddress").val();
 
 	if(vDate == ""){
 		alert("Enter Date of the venue");
@@ -1058,6 +1091,11 @@ function venueValidation(){
                                         <h4 class="modal-title" style="color:white">Attend RSVP</h4>
                                 </div>
                                 <div class="modal-body">
+					<p id="rsvpDate"></p>
+					<p id="rsvpTime"></p>
+					<p id="rsvpAddress"></p>
+					<p id="rsvpCity"></p>
+					<legend></legend>
                                         <label>E-mail Id :</label><br>
 					<input type="text" id="rsvpEmail" style="width:100%">
                                 </div>
