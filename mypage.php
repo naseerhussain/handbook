@@ -194,6 +194,8 @@ else // Not logged in
 
 	<link href="css/overlay-bootstrap.min.css" rel="stylesheet">
 
+	<link href="css/jquery.tagsinput.css" rel="stylesheet">
+
         <script type="text/javascript" charset="utf-8" src="lib/jquery.min.js"></script>
 
 	<script type="text/javascript" src="lib/bootstrap.min.js"></script>
@@ -204,8 +206,8 @@ else // Not logged in
 	
 	<script type="text/javascript" src="lib/bootstrap-popover.js"></script>
 
-<!--	<script type="text/javascript" src="lib/jquery.smoothState.js"></script>
-
+	<script type="text/javascript" src="lib/jquery.tagsinput.js"></script>
+<!--
 	<script type="text/javscript" src="lib/function.js"></script>
 
 	<script type="text/javascript" src="lib/bootstrap-transition.js"></script>
@@ -232,6 +234,14 @@ var id = '<?php echo $_SESSION['twitter_id'];?>';
 
 $(document).ready(function(){
 	//$("#mylistTabMenu").hide();
+
+//	$(".tags").tagsInput();
+	//$('.tags').tagsInput({onChange: onChangeTag});
+	$('input.tags').tagsInput({onAddTag:onAddTag,onRemoveTag:onRemoveTag,onChange: onChangeTag});
+//	$('.tags').tagsInput({interactive:false});
+	//$("#searchTech").tagsInput();
+	//$("#searchLocation").tagsInput();
+
 	var isTile = 0;
 	for(var k=0;k<company.length;k++){
 		for(var i=0;i<getTilesInfo.length;i++){
@@ -506,22 +516,26 @@ $(document).ready(function(){
 
 	//Search functionality for the company tiles
 	$("#searchCategory").keyup(function(){
+		/*
                 clearContainer();
                 var search = $("#searchCategory").val();
-                filteredResults(company, search, "category");
+                filteredResults(company, search, "category");*/
         });
 
         //Search technology function
         $("#searchTech").keyup(function(){
+		/*
                 clearContainer();
                 var search = $("#searchTech").val();
-                filteredResults(company, search, "technology");
+                filteredResults(company, search, "technology");*/
+		console.log("hwwdwf");
         });
         
         $("#searchLocation").keyup(function(){
+		/*
                 clearContainer();
                 var search = $("#searchLocation").val();
-                filteredResults(company,search,"location");
+                filteredResults(company,search,"location");*/
         });
 
 
@@ -529,6 +543,57 @@ $(document).ready(function(){
 
 function clearContainer(){
         $("div .thumbnail").remove();
+}
+
+function listToArray(fullString, separator) {
+  var fullArray = [];
+
+  if (fullString !== undefined) {
+    if (fullString.indexOf(separator) == -1) {
+      fullArray.push(fullString);
+    } else {
+      fullArray = fullString.split(separator);
+    }
+  }
+
+  return fullArray;
+}
+
+
+function onChangeTag(input,tag){
+	tagsSearch();
+}
+
+function onAddTag(tag){
+	tagsSearch();
+}
+function onRemoveTag(tag){
+	tagsSearch();
+}
+
+function tagsSearch(){
+	//console.log($(".tags").importTags(''));
+	var tech = ($("#searchTech").val() != "") ? listToArray($("#searchTech").val(), ",") : 0 ;
+	var loc = ($("#searchLocation").val() != "") ? listToArray($("#searchLocation").val(),",") : 0;
+	var cat = ($("#searchCategory").val() != "") ? listToArray($("#searchCategory").val(),",") : 0;
+	var searchTech = [], searchLoc=[], searchCat = [];
+
+	if(tech != 0){
+		for(var i=0;i<tech.length;i++){
+			searchTech.push(tech[i]);
+		}
+	}
+	if(loc != 0){
+		for(var i=0;i<loc.length;i++){
+			searchLoc.push(loc[i]);
+		}
+	}
+	if(cat != 0){
+		for(var i=0;i<cat.length;i++){
+			searchCat.push(cat[i]);
+		}
+	}
+	filteredResults(company, searchTech, searchLoc, searchCat);
 }
 
 //Function to draw company topic tiles
@@ -644,20 +709,50 @@ function drawTiles(getTilesInfo, id, cName){
 
 }
 
-//Generate search filter results
-function filteredResults(company,search, attribute){
-        
-        for(var i=0;i<company.length;i++){
-                var str = company[i];
-                str = str[attribute];
-                if(str.search(search) > -1){
-			var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+company[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+company[i].name+'</div></legend><p class="text-center">'+company[i].category+'</p><p class="text-center">'+company[i].technology+'</p><a class="divLink" id="'+company[i].name+'" zid="'+company[i].twitter_id+'"></a><p class="text-center">'+company[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+company[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+company[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
-
-                        $("#thumbnails").append(div);   
+function returnArray(company, search, attribute){
+	 var result =[];
+        if(search.length > 0){
+                for(var i=0;i<company.length;i++){
+                                
+                        for(var j=0;j<search.length;j++){
+                                var cat = search[j];
+				var comp = company[i];
+				comp = comp[attribute];
+                                if(comp.search(cat) > -1){
+                                        result.push(company[i]);
+                                }
+                        }
                 }
-
-
         }
+	return result;
+}
+
+//Generate search filter results
+function filteredResults(company,searchTech, searchLoc, searchCat){ //, attribute){
+        
+	clearContainer();
+	var results = company ;
+	if(searchCat.length > 0){
+		results = returnArray(results, searchCat, "category");
+	}
+
+	if(searchTech.length > 0){
+		results = returnArray(results, searchTech, "technology");
+	}
+
+	if(searchLoc.length > 0){
+		results = returnArray(results, searchLoc, "location");
+	}
+	
+	console.log(results);
+	
+	for(var i=0 ; i< results.length ; i++){
+		
+			var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+results[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+results[i].name+'</div></legend><p class="text-center">'+results[i].category+'</p><p class="text-center">'+results[i].technology+'</p><a class="divLink" id="'+results[i].name+'" zid="'+results[i].twitter_id+'"></a><p class="text-center">'+results[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+results[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+results[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+			
+                        $("#thumbnails").append(div);   
+	}
+
         $(".thumbnail").click(function(){
                 var clicked = $(this).find("a:first").attr("id");
                 var zid = $(this).find("a:first").attr("zid");
@@ -822,9 +917,9 @@ function venueValidation(){
                                         </thead>
                                         <tbody>
                                                 <tr>
-                                                        <td><input type="text" id="searchCategory"></td>
-                                                        <td><input type="text" id="searchTech"></td> 
-                                                        <td><input type="text" id="searchLocation"></td>
+                                                        <td><input class="tags" type="text" id="searchCategory"></td>
+                                                        <td><input class="tags" type="text" id="searchTech"></td> 
+                                                        <td><input class="tags" type="text" id="searchLocation"></td>
                                                 </tr>
                                         <tbody>
                                 </table>
