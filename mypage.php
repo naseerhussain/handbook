@@ -238,6 +238,7 @@ $(document).ready(function(){
 //	$(".tags").tagsInput();
 	//$('.tags').tagsInput({onChange: onChangeTag});
 	$('input.tags').tagsInput({onAddTag:onAddTag,onRemoveTag:onRemoveTag,onChange: onChangeTag});
+	$("#topicInfoDetails").hide();
 //	$('.tags').tagsInput({interactive:false});
 	//$("#searchTech").tagsInput();
 	//$("#searchLocation").tagsInput();
@@ -698,7 +699,9 @@ function drawTiles(getTilesInfo, id, cName){
                 var clicked = $(this).find("a:first").attr("id");
                 var zid = $(this).find("a:first").attr("zid");
 
-                clearContainer();
+                //clearContainer();
+		console.log("clicked");
+		$("#topicInfoDetails").show();
                 showTileInfo(getTilesInfo, company,clicked,zid);    
                 
         });
@@ -783,10 +786,11 @@ function showTileInfo(getTilesInfo, company, clicked, zid){
                 for(var i=0;i<getTilesInfo.length;i++){
                         if(company[k].twitter_id == getTilesInfo[i].twitter_id && company[k].name == getTilesInfo[i].companyName){
                                 if(getTilesInfo[i].name == clicked && zid == getTilesInfo[i].id){
-                                        var div = '<div class="thumbnail" style="width:90%;margin-left:5%;"><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
+                                        var div = '<div><legend>'+getTilesInfo[i].name+'<span class="pull-right small" style="margin-right:2%;">Company Name &nbsp;: &nbsp;'+company[k].name+'</span></legend><img src="uploads/'+company[k].id+'" height="50%" width="50%"><br><legend><p class="text-center">About Company</p></legend><p class="text-center">'+company[k].about+'</p><br> <table class="table table-condensed"><thead><tr><th class="pull-left">About This Product</th><th class="text-center">Intent</th></tr></thead><tbody><tr><td class="text-center pull-left">'+getTilesInfo[i].about+'</td><td class="text-center">'+getTilesInfo[i].intent+'</td></tr></tbody></table><br><table class="table table-condensed"><thead><tr><th>Can Teach</th><th>Venue</th><th>RSVP</th><th>Location</th></tr></thead><tbody><tr><td>'+getTilesInfo[i].canTeach+'</td><td>'+getTilesInfo[i].venue+'</td><td>'+getTilesInfo[i].rsvp+'</td><td>'+getTilesInfo[i].location+'</td></tr></tbody></table></div>';
 
 
-                            	        $("#topicTileClicked").append(div);
+                            	        //$("#topicTileClicked").append(div);
+					$("#topicInfoDetails").append(div);
                                 }
                         }
                 }
@@ -936,7 +940,7 @@ function venueValidation(){
                         </div>
 
 			
-			<a style="margin-left:-150px;margin-top:70px;position:absolute" id="addCompany" data-toggle="modal" data-target="#signUpModal">Add Company</a><br>
+			<a style="margin-left:-150px;margin-top:70px;position:absolute;float:right;" id="addCompany" data-toggle="modal" data-target="#signUpModal">Add Company</a><br>
 			<div class="row" style="margin-top:5%; background-color:#E0E0E0;">
                 	        <div class = "tiles">
                         	        <!--<div class="tiles-li col-sm-6 col-md-4 col-lg-3"><div class="well">3<br>product</div></div>-->
@@ -946,10 +950,22 @@ function venueValidation(){
                 	</div>
 
             </div>
+
             <div class="tab-pane" id="mylist-tab">
 			<br><br>
 			<legend></legend>
+			
+			<div class="alert" style="background-color:#F2F2F2;width:80%;">
+  				<button type="button" class="close" data-dismiss="alert">&times;</button>
+  				<!--<strong>Warning!</strong> Best check yo self, you're not looking too good.-->
+				 <label>Subscribe :</label>
+                                <input type="text" class="input-sm" placeholder="E-mail Id" id="subscribeEmail" >&nbsp;&nbsp;
+                                <button id="subscribe" class="btn btn-sm btn-success">Subscribe</button>
+
+			</div>
+
 			<a style="margin-left:-150px;position:absolute;margin-top:35px;" id="addTopic" data-toggle="modal" data-target="#topicTileModal" >Add List</a>
+
 			<div class="row" style="margin-top:5%; background-color:#E0E0E0;width:90%;">
                                 <div class = "tiles">
                                         <!--<div class="tiles-li col-sm-6 col-md-4 col-lg-3"><div class="well">3<br>product</div></div>-->
@@ -957,14 +973,10 @@ function venueValidation(){
                                         </div>
                                 </div>
                         </div>
-			<div style="background-color:#ccffcc;width:90%;">
-			<div  id="footer" class="jumbotron-overlay-up">
-				<label>Subscribe :</label>
-                                <input type="text" class="input-sm" placeholder="E-mail Id" id="subscribeEmail" >&nbsp;&nbsp;
-                                <button id="subscribe" class="btn btn-sm btn-success">Subscribe</button>
+
+			<div class="alert" id="topicInfoDetails" style="margin-left:60%;background-color:#F2F2F2;width:50%;height:100%;opacity:0.8;margin-top:-36%;">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
 			</div>
-			</div>
-			<div id="topicTileClicked" class="my-overlay-trigger"></div>
             </div>
 	</div>
 
