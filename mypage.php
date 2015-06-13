@@ -728,10 +728,10 @@ function returnArray(company, search, attribute){
 }
 
 //Generate search filter results
-function filteredResults(company,searchTech, searchLoc, searchCat){ //, attribute){
+function filteredResults(comp,searchTech, searchLoc, searchCat){ //, attribute){
         
 	clearContainer();
-	var results = company ;
+	var results = comp ;
 	if(searchCat.length > 0){
 		results = returnArray(results, searchCat, "category");
 	}
@@ -743,14 +743,16 @@ function filteredResults(company,searchTech, searchLoc, searchCat){ //, attribut
 	if(searchLoc.length > 0){
 		results = returnArray(results, searchLoc, "location");
 	}
+
 	
-	console.log(results);
-	
+	var temp = "";
 	for(var i=0 ; i< results.length ; i++){
-		
-			var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+results[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+results[i].name+'</div></legend><p class="text-center">'+results[i].category+'</p><p class="text-center">'+results[i].technology+'</p><a class="divLink" id="'+results[i].name+'" zid="'+results[i].twitter_id+'"></a><p class="text-center">'+results[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+results[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+results[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+			if(temp != results[i].name){
+				temp = results[i].name;
+				var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+results[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+results[i].name+'</div></legend><p class="text-center">'+results[i].category+'</p><p class="text-center">'+results[i].technology+'</p><a class="divLink" id="'+results[i].name+'" zid="'+results[i].twitter_id+'"></a><p class="text-center">'+results[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+results[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+results[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
 			
-                        $("#thumbnails").append(div);   
+                        	$("#thumbnails").append(div);   	
+			}
 	}
 
         $(".thumbnail").click(function(){
