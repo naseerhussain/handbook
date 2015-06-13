@@ -749,22 +749,30 @@ function filteredResults(comp,searchTech, searchLoc, searchCat){ //, attribute){
 	for(var i=0 ; i< results.length ; i++){
 			if(temp != results[i].name){
 				temp = results[i].name;
-				var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+results[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+results[i].name+'</div></legend><p class="text-center">'+results[i].category+'</p><p class="text-center">'+results[i].technology+'</p><a class="divLink" id="'+results[i].name+'" zid="'+results[i].twitter_id+'"></a><p class="text-center">'+results[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+results[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+results[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
+				if(results[i].twitter_id == id){
+					var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+results[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+results[i].name+'</div></legend><p class="text-center">'+results[i].category+'</p><p class="text-center">'+results[i].technology+'</p><a class="divLink" id="'+results[i].name+'" zid="'+results[i].twitter_id+'"></a><p class="text-center">'+results[i].location+'</p><div class="changes" style="z-index:9999;"><legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+results[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:10px;"></a><a class="remove2"><img src="images/delete.png" zid="'+results[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:10px;"></a></legend></div></div>';
 			
-                        	$("#thumbnails").append(div);   	
+                        		$("#thumbnails").append(div);   	
+				}else{
+                       		 	var div = '<div class="thumbnail"><div style="height:120px;width:100%;overflow:hidden;"><img src="uploads/'+results[i].id+'" height="100%;" width="100%"></div><legend ><div style="text-align:center">'+results[i].name+'</div></legend><p class="text-center">'+results[i].category+'</p><p class="text-center">'+results[i].technology+'</p><a class="divLink" id="'+results[i].name+'" zid="'+results[i].twitter_id+'"></a><p class="text-center">'+results[i].location+'</p></div>';
+                			$("#thumbnails").append(div);   
+				}
 			}
 	}
 
-        $(".thumbnail").click(function(){
+	$(".thumbnail").click(function(){
                 var clicked = $(this).find("a:first").attr("id");
                 var zid = $(this).find("a:first").attr("zid");
-                console.log(clicked);
-                console.log(zid);
-                $("#table").hide();
-                $("#goBack").show();
-                clearContainer();               
+
+                $("#mylistTabMenu").show();
+                $("#company-tab").removeClass('active');
+                $("#mylist-tab").addClass('active');
+                $("#mylistTabMenu").addClass('active');
+                $("#companyTabMenu").removeClass('active');
+                //-showTileInfo(getTilesInfo, company,clicked,zid);  
                 drawTiles(getTilesInfo, zid, clicked);
         });
+
 
 }
 
