@@ -233,6 +233,7 @@ var venueDetails = '<?php echo $venueDetails; ?>';
 var id = '<?php echo $_SESSION['twitter_id'];?>';
 
 $(document).ready(function(){
+	console.log(id);
 	//$("#mylistTabMenu").hide();
 
 //	$(".tags").tagsInput();
@@ -269,8 +270,9 @@ $(document).ready(function(){
                 $("#thumbnails").append(div);   
         }
 	
+    var compTile;
 	$(".thumbnail").click(function(){
-                var clicked = $(this).find("a:first").attr("id");
+                compTile = $(this).find("a:first").attr("id");
                 var zid = $(this).find("a:first").attr("zid");
 
 		$("#mylistTabMenu").show();
@@ -279,12 +281,39 @@ $(document).ready(function(){
 		$("#mylistTabMenu").addClass('active');
 		$("#companyTabMenu").removeClass('active');
 		//-showTileInfo(getTilesInfo, company,clicked,zid);  
-		drawTiles(getTilesInfo, zid, clicked);
+		drawTiles(getTilesInfo, zid, compTile);
 	});
 	
+    //Function to subscribe for the company tile
+    $("#subscribe").click(function(){
+                var email = $("#subscribeEmail").val();
+
+                if(email == ""){
+                    alert("Enter Email Id");
+                    return;
+                }
+                if (window.XMLHttpRequest) {
+                        // code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp = new XMLHttpRequest();
+                } else {
+                       // code for IE6, IE5
+                       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                //document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+                                console.log(xmlhttp.responseText);
+                        }
+                }
+                xmlhttp.open("GET","subscribe.php?twitter_id="+id+"&email="+email+"&company="+compTile, true);
+                xmlhttp.send();
+                alert("Thanks for subscribing for "+compTile);
+                
+    });
+
 
 	var compClicked;        
-        $(".remove1").click(function(){
+    $(".remove1").click(function(){
                 event.stopPropagation();
                 compClicked = $(this).find("img:first").attr("zid");
                 $("#updateProfileModal").modal('show');
@@ -598,18 +627,24 @@ function tagsSearch(){
 }
 
 //Function to draw company topic tiles
-function drawTiles(getTilesInfo, id, cName){
+function drawTiles(getTilesInfo, tid, cName){
         
         for(var i=0;i<getTilesInfo.length;i++){
 		var div = "";
-                if(getTilesInfo[i].twitter_id == id && getTilesInfo[i].companyName == cName){
+                if(getTilesInfo[i].twitter_id == tid && getTilesInfo[i].companyName == cName){
                         
-                         div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p><div class="changes" style="z-index:9999;"><legend></legend><a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:-10px;"></a>';
+                         div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></p> <div class="changes" style="z-index:9999;"><legend></legend>';
 
+			if(getTilesInfo[i].twitter_id == id){
+				div += '<a class="remove1"><img src="images/edit.png" id="remove1" zid="'+getTilesInfo[i].id+'"title="Edit" width="15" height="15" class="pull-left" style="position:relative;top:-10px;"></a>';
+			}
 			if(getTilesInfo[i].rsvp=="yes"){
 				div += '<img src="images/attend1.png" zid="'+getTilesInfo[i].id+'" cid="'+getTilesInfo[i].companyName+'" tid="'+getTilesInfo[i].name+'" id="rsvpattend" title="Join RSVP" class="attendRSVP" width="45" height="25" style="margin-left:30%;margin-top:-25px;" >';
 			}
-			div += '<a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:-10px;"></a></div></div>';
+			if(getTilesInfo[i].twitter_id == id){
+				div += '<a class="remove2"><img src="images/delete.png" zid="'+getTilesInfo[i].id+'" id="remove2" title="Delete" width="15" height="15" class="pull-right" style="position:relative;top:-10px;"></a>';
+			}
+			div += '</div></div>';
                 } /*else{
                         
                         var div = '<div class="thumbnail"><legend>'+getTilesInfo[i].name+'</legend><p>'+getTilesInfo[i].intent+'</p><p>'+getTilesInfo[i].about+'</p><p>Can Teach :'+getTilesInfo[i].canTeach+'</p><p>Venue :'+getTilesInfo[i].venue+'</p><p>RSVP :'+getTilesInfo[i].rsvp+'</p><p><a class="divLink" id="'+getTilesInfo[i].name+'" zid="'+getTilesInfo[i].id+'"></a></div>';

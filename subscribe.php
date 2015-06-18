@@ -6,12 +6,13 @@
 	$id = $_GET["id"];
 	$twitter_id = $_GET["twitter_id"];
 	$email = $_GET["email"];
+	$comp = $_GET["company"];
 
 	if(! $conn){
         	die("Connection failed: " . mysql_error());
 	}
 
-	$sql = "INSERT INTO subscribers(id, twitter_id, email) VALUES(NULL,'$twitter_id','$email')"; 
+	$sql = "INSERT INTO subscribers(id, twitter_id, email, company) VALUES(NULL,'$twitter_id','$email','$comp')"; 
 	mysql_select_db('handbook');
 //	mysql_select_db('bookmane_handbook');
 	$insert = mysql_query( $sql, $conn );
